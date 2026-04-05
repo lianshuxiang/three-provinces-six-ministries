@@ -15,3 +15,6 @@ export { SystemOrchestrator } from './orchestrator';
 export { ZhongshuProvince, zhongshuProvince } from './zhongshu/province';
 export { MenxiaProvince, menxiaProvince } from './menxia/province';
 export { ShangshuProvince, shangshuProvince } from './shangshu/province';
+
+// 六部
+export * from './ministries';
