@@ -1,0 +1,41 @@
+{
+  "name": "three-provinces-six-ministries",
+  "version": "1.0.0",
+  "description": "三省六部 Agent 系统 - 基于 Claude Code 自迭代机制",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "ts-node agents/tests/index.ts",
+    "dev": "ts-node agents/index.ts",
+    "example": "ts-node examples.ts",
+    "example:1": "ts-node examples.ts 1",
+    "example:2": "ts-node examples.ts 2",
+    "example:3": "ts-node examples.ts 3",
+    "example:4": "ts-node examples.ts 4",
+    "cost:status": "ts-node -e \"import {costTracker} from './agents/cost/tracker'; const data = costTracker.exportData(); console.log(JSON.stringify(data, null, 2))\"",
+    "cost:export": "npm run cost:status > cost-report.json",
+    "cost:reset": "ts-node -e \"import {costTracker} from './agents/cost/tracker'; costTracker.clearHistory(); console.log('✅ 成本记录已清除')\"",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "agent",
+    "ai",
+    "claude-code",
+    "chinese-imperial-system",
+    "three-provinces",
+    "six-ministries"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
