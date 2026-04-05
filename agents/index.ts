@@ -18,3 +18,6 @@ export { ShangshuProvince, shangshuProvince } from './shangshu/province';
 
 // 六部
 export * from './ministries';
+
+// 迭代系统
+export * from './iteration';
