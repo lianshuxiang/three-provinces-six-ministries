@@ -1,7 +1,11 @@
 # 三省六部系统 - Git 忽略文件
 
-# 工作区（独立 git 仓库）
-workspace/
+# 工作区 - 忽略大部分，workspace/*
+# 但包含重要文档
+!workspace/memory/
+!workspace/QUICK-START.md
+!workspace/USAGE.md
+!workspace/README-FOR-USER.md
 
 # 会话文件（运行时生成）
 agents/*/sessions/
