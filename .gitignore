@@ -1,0 +1,78 @@
+# 三省六部系统 - Git 忽略文件
+
+# 工作区（独立 git 仓库）
+workspace/
+
+# 会话文件（运行时生成）
+agents/*/sessions/
+agents/main/
+
+# 依赖
+node_modules/
+package-lock.json
+yarn.lock
+
+# 敏感信息
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+credentials/
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# 编译产物
+dist/
+build/
+*.js
+*.js.map
+*.d.ts
+!types.ts
+
+# 但保留这些 TypeScript 文件
+!agents/**/*.ts
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 检查点数据（运行时生成）
+agents/*/data/
+agents/checkpoints/*.json
+agents/transactions/*.json
+agents/backups/*
+
+# 共享上下文（运行时生成）
+agents/shared/*.json
+
+# 缓存
+.cache/
+.npm/
+
+# 临时测试
+*.test.ts
+test-results/

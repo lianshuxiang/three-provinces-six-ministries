@@ -1,0 +1,74 @@
+# R003: 紧急强制执行
+# 优先级: P1
+# 创建时间: 2025-04-05
+
+id: R003
+name: 紧急强制执行
+priority: P1
+enabled: true
+
+# 触发条件
+trigger:
+  # 关键词检测
+  keywords:
+    - "紧急"
+    - "立即"
+    - "force"
+    - "生产"
+    - "production"
+    - "critical"
+    - "严重"
+    - "宕机"
+    - "崩溃"
+    - "事故"
+  
+  # 情境检测
+  contexts:
+    - error_level: "critical"
+    - service_down: true
+    - data_loss_risk: true
+
+# 触发后的动作
+action:
+  - step: detect
+    description: "识别紧急程度"
+    
+  - step: skip_review
+    description: "跳过门下省审议"
+    skipPhases: ["门下省审议"]
+    
+  - step: execute_immediately
+    description: "直接进入执行阶段"
+    
+  - step: alert_user
+    description: "通知用户使用紧急模式"
+    message: "⚠️ 检测到紧急任务，已跳过审议直接执行"
+    
+  - step: post_execution_review
+    description: "执行完成后必须补充验收"
+    requirePostExecutionReview: true
+
+# 限制条件
+constraints:
+  - 仍然需要路由层分类
+  - 仍然需要门下省事后验收
+  - 成本控制仍然生效
+  - 规则 R001 仍然生效
+
+# 日志记录
+logging:
+  level: "warn"
+  saveTo: "~/.openclaw/logs/emergency-executions.log"
+  includeContext: true
+
+# 示例
+examples:
+  - scenario: "生产环境严重 bug"
+    user_input: "紧急！生产环境登录功能崩溃，立即修复！"
+    trigger: "关键词：紧急、生产、立即"
+    action: "跳过审议，直接执行，事后补充验收"
+    
+  - scenario: "数据库连接失败"
+    error_detected: "Database connection failed"
+    trigger: "错误级别：critical"
+    action: "主动进入紧急模式"

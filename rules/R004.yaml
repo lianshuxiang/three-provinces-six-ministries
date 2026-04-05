@@ -1,0 +1,106 @@
+# R004: 预览确认模式
+# 优先级: P1
+# 创建时间: 2025-04-05
+
+id: R004
+name: 预览确认模式
+priority: P1
+enabled: true
+
+# 触发条件
+trigger:
+  # 任务类型
+  taskTypes:
+    - multi_file_modification   # 多文件修改
+    - refactoring               # 重构
+    - feature_development       # 新功能开发
+    - database_migration        # 数据库迁移
+    - deployment                # 部署
+  
+  # 影响范围
+  impactThreshold:
+    filesAffected: 3            # 影响 3 个以上文件
+    testsAffected: true         # 需要更新测试
+    databaseChange: true        # 数据库变更
+    configChange: true          # 配置变更
+
+# 触发后的动作
+action:
+  - step: generate_preview
+    description: "生成执行计划预览"
+    template: |
+      📋 执行计划预览：
+      
+      **将要执行的操作**:
+      {{#each operations}}
+      - {{this}}
+      {{/each}}
+      
+      **影响范围**:
+      - 文件：{{filesCount}} 个
+      - 测试：{{testsCount}} 个可能需要更新
+      {{#if breakingChange}}
+      - ⚠️ 可能存在破坏性变更
+      {{/if}}
+      
+      **预估时间**：{{estimatedTime}}
+      **预估成本**：${{estimatedCost}}
+      
+  - step: wait_confirmation
+    description: "等待用户确认"
+    options:
+      - "Y / 是" - 确认执行
+      - "N / 否" - 取消任务
+      - "M / 修改" - 修改计划
+      - "D / 详情" - 查看详情
+      
+  - step: handle_response
+    description: "根据用户响应处理"
+    cases:
+      - response: "Y"
+        action: "execute"
+      - response: "N"
+        action: "cancel"
+      - response: "M"
+        action: "ask_modification"
+      - response: "D"
+        action: "show_details"
+
+# 豁免情况
+exemptions:
+  - condition: "user_disabled_preview"
+    description: "用户明确关闭预览模式"
+  - condition: "emergency_mode"
+    description: "紧急模式（R003）激活时"
+  - condition: "single_file_readonly"
+    description: "只读单文件"
+
+# 配置
+config:
+  defaultEnabled: true           # 默认开启
+  userCanToggle: true             # 用户可以关闭
+  rememberChoice: true            # 记住用户选择
+
+# 示例
+examples:
+  - scenario: "重构登录模块"
+    trigger: "多文件修改 + 重构"
+    preview: |
+      📋 执行计划预览：
+      
+      **将要执行的操作**:
+      - 修改：auth/login.ts
+      - 修改：auth/utils.ts
+      - 新增：auth/middleware.ts
+      - 修改：tests/auth.test.ts
+      
+      **影响范围**:
+      - 文件：4 个
+      - 测试：1 个需要更新
+      - ⚠️ 可能存在破坏性变更
+      
+      **预估时间**：2-3 分钟
+      **预估成本**：$0.15
+      
+    userResponse: "Y"
+    action: "开始执行"

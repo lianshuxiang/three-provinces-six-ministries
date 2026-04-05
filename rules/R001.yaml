@@ -1,0 +1,108 @@
+# R001: 非技术问题及时反馈
+# 优先级: P0（最高）
+# 创建时间: 2025-04-05
+
+id: R001
+name: 非技术问题及时反馈
+priority: P0
+enabled: true
+
+# 触发条件
+trigger:
+  # 错误类型
+  errorTypes:
+    - permission_denied      # 权限被拒绝
+    - authentication_failed  # 认证失败
+    - account_locked         # 账号锁定
+    - quota_exceeded         # 配额耗尽
+    - api_key_invalid        # API 密钥失效
+    - access_forbidden       # 访问被禁止
+    - network_blocked        # 网络被阻止
+    - rate_limited           # 频率限制（持续）
+    - subscription_expired   # 订阅过期
+  
+  # 错误关键词匹配
+  errorPatterns:
+    - "permission denied"
+    - "access denied"
+    - "unauthorized"
+    - "forbidden"
+    - "quota"
+    - "limit exceeded"
+    - "invalid.*key"
+    - "expired"
+    - "locked"
+    - "suspended"
+
+# 触发条件：重试次数
+condition:
+  retryCount: ">=3"           # 重试 3 次后触发
+  category: "non-technical"   # 分类为非技术问题
+  timeWindow: 300000          # 5分钟内累计
+
+# 触发后的动作
+action:
+  - step: stop
+    description: "立即停止当前任务"
+    
+  - step: analyze
+    description: "分析问题类型和原因"
+    output:
+      - errorType
+      - possibleCause
+      - affectedResources
+      
+  - step: report
+    description: "生成问题报告并反馈用户"
+    template: |
+      ⚠️ 检测到非技术问题，需要您介入处理：
+      
+      **问题类型**: {{errorType}}
+      **错误信息**: {{errorMessage}}
+      **尝试次数**: {{retryCount}}
+      **可能原因**: {{possibleCause}}
+      
+      **建议操作**:
+      {{#each suggestions}}
+      - {{this}}
+      {{/each}}
+      
+      请处理后告诉我继续，或提供更多信息。
+      
+  - step: wait
+    description: "等待用户确认或提供信息"
+    timeout: null             # 无限等待
+    
+  - step: resume
+    description: "用户确认后继续执行"
+    requireUserConfirmation: true
+
+# 豁免情况（不触发此规则）
+exemptions:
+  - condition: "userExplicitlyApproved"
+    description: "用户明确要求继续尝试"
+  - condition: "temporaryGlitch"
+    description: "临时故障，已自动恢复"
+
+# 日志记录
+logging:
+  level: "warn"
+  saveTo: "~/.openclaw/logs/non-technical-issues.log"
+  includeContext: true
+
+# 示例
+examples:
+  - scenario: "Git push 权限被拒绝"
+    trigger: "Permission denied (publickey)"
+    retryCount: 3
+    action: "停止并报告用户检查 SSH 密钥配置"
+    
+  - scenario: "API 配额耗尽"
+    trigger: "Rate limit exceeded"
+    retryCount: 3
+    action: "停止并报告用户升级配额或等待重置"
+    
+  - scenario: "账号被锁定"
+    trigger: "Account temporarily locked"
+    retryCount: 1
+    action: "立即停止（无需等待3次）并报告用户"

@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "id": "R001",
+      "name": "非技术问题及时反馈",
+      "priority": "P0",
+      "enabled": true,
+      "created": "2025-04-05T06:00:00Z",
+      "description": "遇到权限、账号等非技术问题，重试3次后必须停止并反馈用户"
+    },
+    {
+      "id": "R002",
+      "name": "成本预算控制",
+      "priority": "P0",
+      "enabled": true,
+      "created": "2025-04-05T06:07:00Z",
+      "description": "单任务上限$5
+每日$100，每月$2000，超限暂停并询问用户"
+    },
+    {
+      "id": "R003",
+      "name": "紧急强制执行",
+      "priority": "P1",
+      "enabled": true,
+      "created": "2025-04-05T06:07:00Z",
+      "description": "识别紧急关键词后跳过审议直接执行，事后补充验收"
+    },
+    {
+      "id": "R004",
+      "name": "预览确认模式",
+      "priority": "P1",
+      "enabled": true,
+      "created": "2025-04-05T06:07:00Z",
+      "description": "复杂任务默认开启预览模式，用户确认后执行"
+    }
+  ]
+}
