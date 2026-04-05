@@ -66,7 +66,7 @@ export class CostTracker {
   
   // 模型价格表（每 1K tokens）
   private modelPricing: Record<string, { input: number; output: number; cached: number }> = {
-    "glm-4.7": { input: 0.0005, output: 0.001, cached: 0.00005 },
+    // 最高权限规则 R000：只支持 GLM-5
     "glm-5": { input: 0.001, output: 0.002, cached: 0.0001 },
   };
   
@@ -77,7 +77,7 @@ export class CostTracker {
     const timestamp = new Date().toISOString();
     
     // 计算成本
-    const pricing = this.modelPricing[entry.model] || this.modelPricing["glm-4.7"];
+    const pricing = this.modelPricing[entry.model] || this.modelPricing["glm-5"];
     const cost = 
       (entry.tokensIn / 1000 * pricing.input) +
       (entry.tokensOut / 1000 * pricing.output) -

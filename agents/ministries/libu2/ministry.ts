@@ -19,7 +19,7 @@ import type {
 } from '../../types';
 
 export class LibuMinistry {
-  private model: "glm-4.7" = "glm-4.7";
+  private model: "glm-5" = "glm-5"; // 最高权限规则 R000：强制使用 GLM-5
   
   /**
    * 执行通信文档任务

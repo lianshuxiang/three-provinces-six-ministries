@@ -136,7 +136,7 @@ export class GongbuMinistry {
     return {
       round,
       agent: "tester",
-      model: "glm-4.7", // 刑部使用 GLM-4.7
+      model: "glm-5", // 最高权限规则 R000
       action: `测试: ${task.description}`,
       result: testResult.passed ? "success" : "failure",
       verification: {

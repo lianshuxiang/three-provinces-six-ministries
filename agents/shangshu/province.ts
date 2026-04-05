@@ -228,7 +228,7 @@ export class ShangshuProvince {
     return {
       round,
       agent: "tester",
-      model: "glm-4.7",
+      model: "glm-5" // 强制使用 GLM-5（最高权限规则 R000）,
       action: `测试任务：${task.description}`,
       result: "success",
       verification: {
@@ -537,14 +537,14 @@ export class ShangshuProvince {
   /**
    * 获取部门对应的模型
    */
-  private getModelForMinistry(ministry: Ministry): "glm-4.7" | "glm-5" {
+  private getModelForMinistry(ministry: Ministry): "glm-5" // 强制使用 GLM-5（最高权限规则 R000） | "glm-5" {
     const glm47Ministries: Ministry[] = ["吏部", "户部", "礼部", "刑部"];
     const glm5Ministries: Ministry[] = ["兵部", "工部"];
     
-    if (glm47Ministries.includes(ministry)) return "glm-4.7";
+    if (glm47Ministries.includes(ministry)) return "glm-5" // 强制使用 GLM-5（最高权限规则 R000）;
     if (glm5Ministries.includes(ministry)) return "glm-5";
     
-    return "glm-4.7";
+    return "glm-5" // 强制使用 GLM-5（最高权限规则 R000）;
   }
   
   /**

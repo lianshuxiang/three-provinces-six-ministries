@@ -22,7 +22,7 @@ import type {
 } from '../types';
 
 export class ZhongshuProvince {
-  private model: "glm-4.7" = "glm-4.7";
+  private model: "glm-5" = "glm-5"; // 强制使用 GLM-5（最高权限规则 R000）
   private maxIterations: number = 3;  // 封驳迭代最多 3 次
   
   /**
