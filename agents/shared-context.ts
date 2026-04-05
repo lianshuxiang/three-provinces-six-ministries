@@ -1,136 +1,198 @@
 /**
- * 共享上下文层
+ * 共享上下文管理器
  */
 
-import { 
-  SharedContext, 
-  Decision,
+import type {
+  SharedContext,
   Phase,
-  CostTracking
-  CostBreakdown[],
-  timestamps
+  Decision,
+  CostBreakdown,
 } from './types';
 
 export class SharedContextManager {
-  private context: SharedContext;
+  private context: SharedContext | null = null;
   private contextFile: string;
   
-  /**
-   * 初始化共享上下文
-   */
-  init(): void {
-    this.context.sessionId = this.generateSession ID();
-    this.loadContext();
+  constructor(contextFile?: string) {
+    this.contextFile = contextFile || '';
   }
   
   /**
-   * 更新上下文
+   * 创建新上下文
    */
-  updateContext(phase: Phase, agent: string): void {
+  createNewContext(sessionId: string): SharedContext {
     const timestamp = new Date().toISOString();
-    this.context.taskState.currentPhase = phase;
-    this.context.taskState.progress = Math.min(100, ? progress 0 到 100 ? progress = 0;
-    if (delta < 0) {
-      this.context.taskState.progress += delta;
-    } else {
-      progress = 0;
+    
+    this.context = {
+      sessionId,
+      userIntent: {
+        raw: '',
+        parsed: '',
+        timestamp,
+      },
+      taskState: {
+        currentPhase: 'routing',
+        progress: 0,
+      },
+      decisions: [],
+      compressedHistory: '',
+      activeAgent: '',
+      costTracking: {
+        current: 0,
+        estimated: 0,
+        breakdown: [],
+      },
+      timestamps: {
+        created: timestamp,
+        lastUpdated: timestamp,
+      },
+    };
+    
+    return this.context;
+  }
+  
+  /**
+   * 获取当前上下文
+   */
+  getContext(): SharedContext {
+    if (!this.context) {
+      throw new Error('上下文未初始化，请先调用 createNewContext');
     }
+    return this.context;
+  }
+  
+  /**
+   * 加载上下文（从文件）
+   */
+  loadContext(): SharedContext {
+    // 简化实现，实际会从文件加载
+    return this.getContext();
+  }
+  
+  /**
+   * 保存上下文（到文件）
+   */
+  saveContext(): void {
+    // 简化实现，实际会保存到文件
+  }
+  
+  /**
+   * 更新任务状态
+   */
+  updateTaskState(state: Partial<SharedContext['taskState']>): void {
+    if (!this.context) return;
+    
+    Object.assign(this.context.taskState, state);
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
+  }
+  
+  /**
+   * 更新进度
+   */
+  updateProgress(delta: number): void {
+    if (!this.context) return;
+    
+    this.context.taskState.progress = Math.min(100, Math.max(0, 
+      this.context.taskState.progress + delta
+    ));
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
   }
   
   /**
    * 添加决策
    */
-  addDecision(decision: Decision): void {
-    const timestamp = new Date().toISOString();
+  addDecision(decision: Omit<Decision, 'timestamp'>): void {
+    if (!this.context) return;
     
-    this.saveContext();
-  }
-  
-  /**
-   * 添加成本追踪
-   */
-  addCostEntry(cost: CostBreakdown): void {
-    const timestamp = new Date().toISOString();
-    
-    this.saveContext();
-  }
-  }
-  
-  /**
-   * 巻加错误
-   */
-  addError(error: Error): string, stack?: string): void {
-    const timestamp = new Date().toISOString();
-    
-    this.errors.push({
-      phase,
-      agent,
-      error,
-      message
-      stack
+    this.context.decisions.push({
+      ...decision,
+      timestamp: new Date().toISOString(),
     });
     
-    this.context.compressedHistory = trimmed(` < 5KB);
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
+  }
+  
+  /**
+   * 添加成本记录
+   */
+  addCostEntry(cost: Omit<CostBreakdown, never>): void {
+    if (!this.context) return;
+    
+    this.context.costTracking.breakdown.push(cost);
+    this.context.costTracking.current += cost.cost;
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
   }
   
   /**
    * 更新活跃 Agent
    */
   updateActiveAgent(agent: string): void {
-    const timestamp = new Date().toISOString();
-    this.activeAgent = agent;
-  }
-  
-  // 获取压缩后的历史
-  getCompressedHistory(): string {
-    if (!this.compressedHistory) {
-      return '';
-    }
+    if (!this.context) return;
     
-    // 戊省决策点
-    const decisions = this.decisions;
-      phase,
-      agent,
-      decision,
-      reason,
-      timestamp
-    });
-  }
-  
-  return compressedHistory;
-}
-
-export const sharedContextManager = new SharedContextManager {
-  private context: SharedContext | null;
-  private sharedContext: SharedContext;
-  
-  constructor() {
-    super();
-    this.context = new SharedContext(
-      sessionId: string
-    );
-    this.loadContext();
-      if (fs.existsSync(sessionConfigFile)) {
-        const data = JSON.parse(this.sharedContextFile);
-        return data;
-      }
-      return this.context;
-    }
-    return null;
+    this.context.activeAgent = agent;
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
   }
   
   /**
-   * 加载规则
+   * 设置用户意图
    */
-  loadRules(): void {
-    if (!fs.existsSync(rulesFile)) {
-      const rules = this.loadRules().map(r => r.toRule[]);
-      this.rawRules = raw.map(rule => 
-        if (Array.isArray(rule.raw)) {
-          return rule;
-        }
-      }
-    });
+  setUserIntent(raw: string, parsed: string): void {
+    if (!this.context) return;
     
-    return rules;
+    this.context.userIntent = {
+      raw,
+      parsed,
+      timestamp: new Date().toISOString(),
+    };
+    this.context.timestamps.lastUpdated = new Date().toISOString();
+    this.saveContext();
   }
+  
+  /**
+   * 获取压缩历史
+   */
+  getCompressedHistory(): string {
+    if (!this.context) return '';
+    
+    if (this.context.compressedHistory.length < 5000) {
+      return this.context.compressedHistory;
+    }
+    
+    // 压缩历史：保留关键决策点
+    const compressed = this.context.decisions
+      .map(d => `[${d.phase}] ${d.agent}: ${d.decision}`)
+      .join('\n');
+    
+    this.context.compressedHistory = compressed;
+    this.saveContext();
+    
+    return compressed;
+  }
+  
+  /**
+   * 获取决策列表
+   */
+  getDecisions(): Decision[] {
+    if (!this.context) return [];
+    return this.context.decisions;
+  }
+  
+  /**
+   * 获取成本追踪
+   */
+  getCostTracking(): SharedContext['costTracking'] {
+    if (!this.context) {
+      return {
+        current: 0,
+        estimated: 0,
+        breakdown: [],
+      };
+    }
+    return this.context.costTracking;
+  }
+}
