@@ -318,6 +318,109 @@
             font-weight: normal;
         }
 
+        /* 上传进度样式 */
+        .progress-container {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .progress-container.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            line-height: 24px;
+        }
+        
+        .file-info {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .file-info.active {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-info .size {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #333;
+            font-size: 16px;
+        }
+        
         @media (max-width: 768px) {
             .button-group {
                 flex-direction: column;
@@ -342,6 +445,14 @@
         </div>
 
         <div class="content">
+            <!-- 加载遮罩 -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div class="loading-text" id="loadingText">正在处理...</div>
+                </div>
+            </div>
+            
             <!-- 使用说明 -->
             <div class="info-box">
                 <h3>💡 APA7 表格格式要求</h3>
@@ -391,6 +502,21 @@
                         <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(event)">
                     </div>
                     <div id="fileName" style="margin-top: 10px; color: #27ae60; display: none;"></div>
+                    
+                    <!-- 进度条 -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文件信息 -->
+                    <div class="file-info" id="fileInfo">
+                        <span>📄</span>
+                        <span id="fileInfoName"></span>
+                        <span class="size" id="fileInfoSize"></span>
+                    </div>
                 </div>
             </div>
 
@@ -491,39 +617,122 @@
             document.getElementById(`${tabName}-tab`).classList.add('active');
         }
 
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 显示进度
+        function updateProgress(percent) {
+            const container = document.getElementById('progressContainer');
+            const fill = document.getElementById('progressFill');
+            const text = document.getElementById('progressText');
+            
+            container.classList.add('active');
+            fill.style.width = percent + '%';
+            text.textContent = percent + '%';
+        }
+        
+        // 显示加载遮罩
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+        
+        // 隐藏加载遮罩
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+        
+        // 隐藏进度
+        function hideProgress() {
+            document.getElementById('progressContainer').classList.remove('active');
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+        }
+
         // 处理文件上传
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            // 显示文件信息
             const fileName = document.getElementById('fileName');
             fileName.style.display = 'block';
             fileName.innerHTML = `✅ 已选择: ${file.name}`;
+            
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.classList.add('active');
+            document.getElementById('fileInfoName').textContent = file.name;
+            document.getElementById('fileInfoSize').textContent = formatFileSize(file.size);
 
             const reader = new FileReader();
             
+            // 进度回调
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    updateProgress(percent);
+                }
+            };
+            
+            // 开始加载动画
+            reader.onloadstart = function() {
+                updateProgress(0);
+                if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    showLoading('正在解析 Excel 文件...');
+                }
+            };
+            
             if (file.name.endsWith('.csv')) {
                 reader.onload = function(e) {
-                    const text = e.target.result;
-                    document.getElementById('pasteInput').value = text;
-                    switchTab('paste');
-                    document.querySelector('.tab').click();
-                    showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
+                    updateProgress(100);
+                    setTimeout(() => {
+                        const text = e.target.result;
+                        document.getElementById('pasteInput').value = text;
+                        switchTab('paste');
+                        document.querySelector('.tab').click();
+                        showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
+                        hideProgress();
+                    }, 300);
                 };
                 reader.readAsText(file);
             } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
                 reader.onload = function(e) {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const csvData = XLSX.utils.sheet_to_csv(firstSheet);
-                    document.getElementById('pasteInput').value = csvData;
-                    switchTab('paste');
-                    document.querySelector('.tab').click();
-                    showStatus('success', 'Excel 文件已加载！点击"转换为 APA7 格式"按钮。');
+                    updateProgress(100);
+                    setTimeout(() => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, {type: 'array'});
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const csvData = XLSX.utils.sheet_to_csv(firstSheet);
+                            document.getElementById('pasteInput').value = csvData;
+                            switchTab('paste');
+                            document.querySelector('.tab').click();
+                            showStatus('success', 'Excel 文件已加载！点击"转换为 APA7 格式"按钮。');
+                        } catch (err) {
+                            showStatus('error', 'Excel 解析失败: ' + err.message);
+                        }
+                        hideLoading();
+                        hideProgress();
+                    }, 100);
                 };
                 reader.readAsArrayBuffer(file);
+            } else {
+                showStatus('error', '不支持的文件格式！请上传 CSV 或 Excel 文件。');
+                hideProgress();
             }
+            
+            // 错误处理
+            reader.onerror = function() {
+                showStatus('error', '文件读取失败，请重试。');
+                hideLoading();
+                hideProgress();
+            };
         }
 
         // 解析输入数据
