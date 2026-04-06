@@ -656,6 +656,9 @@
                     <button class="btn-success" onclick="downloadAsWord()">
                         📥 下载为 Word 文档
                     </button>
+                    <button class="btn-success" style="background: #217346;" onclick="downloadAsExcel()">
+                        📊 下载为 Excel 文件
+                    </button>
                     <button class="btn-primary" onclick="copyToClipboard()">
                         📋 复制到剪贴板
                     </button>
@@ -1110,6 +1113,107 @@
             const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
             downloadBlob(blob, 'apa7-table.html');
             showStatus('success', '✅ HTML 文件已下载！');
+        }
+
+        // 下载为 Excel 文件
+        function downloadAsExcel() {
+            if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
+                showStatus('error', '请先转换表格！');
+                return;
+            }
+
+            try {
+                const workbook = XLSX.utils.book_new();
+                
+                // 检查是否是多 sheet 转换
+                const tableBlocks = document.querySelectorAll('.table-block');
+                
+                if (tableBlocks.length > 0) {
+                    // 多 sheet 模式
+                    tableBlocks.forEach(function(block, index) {
+                        const table = block.querySelector('.apa-table');
+                        if (!table) return;
+                        
+                        // 提取表格数据
+                        const sheetData = [];
+                        const caption = block.querySelector('.table-caption');
+                        if (caption) {
+                            sheetData.push([caption.innerText]);
+                            sheetData.push([]); // 空行
+                        }
+                        
+                        // 提取表头
+                        const headers = table.querySelectorAll('thead th');
+                        const headerRow = [];
+                        headers.forEach(function(th) {
+                            headerRow.push(th.innerText);
+                        });
+                        sheetData.push(headerRow);
+                        
+                        // 提取数据行
+                        const rows = table.querySelectorAll('tbody tr');
+                        rows.forEach(function(row) {
+                            const rowData = [];
+                            row.querySelectorAll('td').forEach(function(td) {
+                                rowData.push(td.innerText);
+                            });
+                            sheetData.push(rowData);
+                        });
+                        
+                        // 创建工作表
+                        const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                        
+                        // 设置列宽
+                        const colWidths = [];
+                        headerRow.forEach(function() {
+                            colWidths.push({ wch: 15 });
+                        });
+                        ws['!cols'] = colWidths;
+                        
+                        // 添加到工作簿
+                        const sheetName = '表格' + (index + 1);
+                        XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+                    });
+                } else {
+                    // 单表格模式
+                    const sheetData = [];
+                    
+                    // 添加标题
+                    const caption = document.getElementById('tableCaption').innerText;
+                    if (caption) {
+                        sheetData.push([caption]);
+                        sheetData.push([]); // 空行
+                    }
+                    
+                    // 添加数据
+                    if (currentData.length > 0) {
+                        currentData.forEach(function(row) {
+                            sheetData.push(row);
+                        });
+                    }
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                    
+                    // 设置列宽
+                    const colWidths = [];
+                    if (currentData[0]) {
+                        currentData[0].forEach(function() {
+                            colWidths.push({ wch: 15 });
+                        });
+                    }
+                    ws['!cols'] = colWidths;
+                    
+                    XLSX.utils.book_append_sheet(workbook, ws, 'APA表格');
+                }
+                
+                // 下载
+                XLSX.writeFile(workbook, 'apa7-tables.xlsx');
+                showStatus('success', '✅ Excel 文件已下载！');
+                
+            } catch (err) {
+                console.error('Excel 导出错误:', err);
+                showStatus('error', 'Excel 导出失败: ' + err.message);
+            }
         }
 
         // 复制到剪贴板
