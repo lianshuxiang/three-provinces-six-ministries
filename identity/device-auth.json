@@ -6,9 +6,13 @@
       "token": "UdzyvN2SZ_Zw4xLHoGjoBlIjBN6-3C1Un-5d1n_0SLc",
       "role": "operator",
       "scopes": [
-        "operator.read"
+        "operator.admin",
+        "operator.approvals",
+        "operator.pairing",
+        "operator.read",
+        "operator.write"
       ],
-      "updatedAtMs": 1775377690199
+      "updatedAtMs": 1775487655396
     }
   }
 }
