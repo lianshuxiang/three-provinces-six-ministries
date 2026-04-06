@@ -18,7 +18,11 @@
     "cost:export": "npm run cost:status > cost-report.json",
     "cost:reset": "ts-node -e \"import {costTracker} from './agents/cost/tracker'; costTracker.clearHistory(); console.log('✅ 成本记录已清除')\"",
     "clean": "rm -rf dist",
-    "rebuild": "npm run clean && npm run build"
+    "rebuild": "npm run clean && npm run build",
+    "run": "node run-system-auto-yushitai.js",
+    "run:simple": "node simple-interface.js",
+    "yushitai": "node yushitai-optimizer-full.js",
+    "yushitai:check": "node yushitai-permission-checker.js"
   },
   "keywords": [
     "agent",

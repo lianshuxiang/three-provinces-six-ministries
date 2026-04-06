@@ -463,7 +463,13 @@ async function main() {
   console.log(`📄 完整报告已保存: ${reportPath}\n`);
 }
 
-main().catch(error => {
-  console.error('\n❌ 分析失败:', error.message);
-  process.exit(1);
-});
+// 导出模块
+module.exports = YushitaiOptimizer;
+
+// 如果直接运行
+if (require.main === module) {
+  main().catch(error => {
+    console.error('\n❌ 分析失败:', error.message);
+    process.exit(1);
+  });
+}
