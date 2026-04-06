@@ -323,11 +323,11 @@
             margin-top: 15px;
             display: none;
         }
-        
+
         .progress-container.active {
             display: block;
         }
-        
+
         .progress-bar {
             width: 100%;
             height: 24px;
@@ -336,7 +336,7 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
@@ -346,7 +346,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .progress-text {
             position: absolute;
             width: 100%;
@@ -356,7 +356,7 @@
             color: #333;
             line-height: 24px;
         }
-        
+
         .file-info {
             margin-top: 10px;
             padding: 10px 15px;
@@ -365,13 +365,13 @@
             font-size: 14px;
             display: none;
         }
-        
+
         .file-info.active {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .file-info .size {
             color: #666;
             font-size: 12px;
@@ -385,23 +385,23 @@
             border-radius: 8px;
             display: none;
         }
-        
+
         .sheet-selector.active {
             display: block;
         }
-        
+
         .sheet-selector h4 {
             margin-bottom: 10px;
             color: #2c3e50;
         }
-        
+
         .sheet-list {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
         }
-        
+
         .sheet-item {
             padding: 10px 20px;
             background: white;
@@ -410,12 +410,12 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .sheet-item:hover {
             background: #667eea;
             color: white;
         }
-        
+
         .sheet-item.selected {
             background: #667eea;
             color: white;
@@ -434,18 +434,18 @@
             align-items: center;
             z-index: 9999;
         }
-        
+
         .loading-overlay.active {
             display: flex;
         }
-        
+
         .loading-spinner {
             background: white;
             padding: 30px 40px;
             border-radius: 10px;
             text-align: center;
         }
-        
+
         .spinner {
             width: 50px;
             height: 50px;
@@ -455,11 +455,11 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+
         .loading-text {
             color: #333;
             font-size: 16px;
@@ -483,11 +483,11 @@
             .button-group {
                 flex-direction: column;
             }
-            
+
             .tabs {
                 flex-wrap: wrap;
             }
-            
+
             .tab {
                 flex: 1;
                 text-align: center;
@@ -510,17 +510,17 @@
                     <div class="loading-text" id="loadingText">正在处理...</div>
                 </div>
             </div>
-            
+
             <!-- 使用说明 -->
             <div class="info-box">
                 <h3>💡 APA7 表格格式要求</h3>
                 <ul>
-                    <li>表格编号（如：表 1）在表格上方，<strong>加粗</strong></li>
-                    <li>表格标题在表格上方，<em>斜体</em></li>
-                    <li>只使用水平线，不使用垂直线</li>
+                    <li>表格编号(如:表 1)在表格上方,<strong>加粗</strong></li>
+                    <li>表格标题在表格上方,<em>斜体</em></li>
+                    <li>只使用水平线,不使用垂直线</li>
                     <li>列标题<strong>加粗</strong></li>
-                    <li>表格注释在表格下方，<em>斜体</em></li>
-                    <li><strong>支持多 Sheet Excel 文件！</strong></li>
+                    <li>表格注释在表格下方,<em>斜体</em></li>
+                    <li><strong>支持多 Sheet Excel 文件!</strong></li>
                 </ul>
             </div>
 
@@ -534,14 +534,14 @@
             <!-- 粘贴数据 -->
             <div id="paste-tab" class="tab-content active">
                 <div class="input-section">
-                    <label>粘贴你的表格数据（支持 Tab/逗号/分号分隔）：</label>
-                    <textarea id="pasteInput" placeholder="示例：
+                    <label>粘贴你的表格数据(支持 Tab/逗号/分号分隔):</label>
+                    <textarea id="pasteInput" placeholder="示例:
 姓名	年龄	分数	等级
 张三	25	92	A
 李四	28	88	B+
 王五	22	95	A+
 
-或：
+或:
 姓名,年龄,分数,等级
 张三,25,92,A
 李四,28,88,B+
@@ -552,7 +552,7 @@
             <!-- 上传文件 -->
             <div id="upload-tab" class="tab-content">
                 <div class="input-section">
-                    <label>上传 CSV 或 Excel 文件：</label>
+                    <label>上传 CSV 或 Excel 文件:</label>
                     <div class="file-upload">
                         <div class="file-upload-btn">
                             <p>📁 点击或拖拽文件到此处</p>
@@ -561,7 +561,7 @@
                         <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(event)">
                     </div>
                     <div id="fileName" style="margin-top: 10px; color: #27ae60; display: none;"></div>
-                    
+
                     <!-- 进度条 -->
                     <div class="progress-container" id="progressContainer">
                         <div class="progress-bar">
@@ -569,18 +569,66 @@
                             <div class="progress-text" id="progressText">0%</div>
                         </div>
                     </div>
-                    
+
                     <!-- 文件信息 -->
                     <div class="file-info" id="fileInfo">
                         <span>📄</span>
                         <span id="fileInfoName"></span>
                         <span class="size" id="fileInfoSize"></span>
                     </div>
-                    
+
                     <!-- Sheet 选择器 -->
                     <div class="sheet-selector" id="sheetSelector">
-                        <h4>📑 选择要转换的 Sheet：</h4>
+                        <h4>📑 选择要转换的 Sheet:</h4>
                         <div class="sheet-list" id="sheetList"></div>
+
+                        <!-- 当前Sheet的图表配置区 -->
+                        <div class="sheet-chart-config" id="sheetChartConfig" style="display:none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 2px solid #667eea;">
+                            <h5 style="margin: 0 0 15px; color: #2c3e50; font-size: 16px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0;">
+                                📊 <span id="currentSheetName" style="color: #667eea; font-weight: 600;"></span> - 图表配置
+                            </h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 600; color: #2c3e50; display: block; margin-bottom: 5px;">图表类型:</label>
+                                    <select id="sheetChartType" onchange="saveCurrentChartConfig()" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
+                                        <option value="bar">柱状图</option>
+                                        <option value="line">折线图</option>
+                                        <option value="pie">饼图</option>
+                                        <option value="doughnut">环形图</option>
+                                        <option value="horizontalBar">水平柱状图</option>
+                                        <option value="radar">雷达图</option>
+                                        <option value="polarArea">极坐标图</option>
+                                        <option value="scatter">散点图</option>
+                                        <option value="area">面积图</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 600; color: #2c3e50; display: block; margin-bottom: 5px;">X轴列:</label>
+                                    <select id="sheetXAxisColumn" onchange="saveCurrentChartConfig()" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
+                                        <option value="">请选择列</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 600; color: #2c3e50; display: block; margin-bottom: 5px;">Y轴列:</label>
+                                    <select id="sheetYAxisColumn" onchange="saveCurrentChartConfig()" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
+                                        <option value="">请选择列</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="font-size: 13px; font-weight: 600; color: #2c3e50; display: block; margin-bottom: 5px;">图表标题:</label>
+                                <input type="text" id="sheetChartTitle" onchange="saveCurrentChartConfig()" placeholder="例如:数据分布图" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary" onclick="generateSheetChart()" style="flex: 1;">
+                                    📊 生成当前Sheet图表
+                                </button>
+                                <button class="btn-success" onclick="downloadSheetChart()" style="flex: 1;">
+                                    📥 下载当前图表
+                                </button>
+                            </div>
+                        </div>
+
                         <button class="btn-primary" style="padding: 10px 20px;" onclick="convertAllSheets()">
                             🔄 转换所有 Sheet 为 APA 格式
                         </button>
@@ -591,19 +639,19 @@
             <!-- 手动输入 -->
             <div id="manual-tab" class="tab-content">
                 <div class="input-section">
-                    <label>表格标题（斜体显示）：</label>
-                    <input type="text" id="tableTitle" placeholder="例如：学生成绩统计表" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px; margin-bottom: 20px;">
-                    
-                    <label>表格数据（每行一个数据，用逗号分隔）：</label>
+                    <label>表格标题(斜体显示):</label>
+                    <input type="text" id="tableTitle" placeholder="例如:学生成绩统计表" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px; margin-bottom: 20px;">
+
+                    <label>表格数据(每行一个数据,用逗号分隔):</label>
                     <textarea id="manualInput" placeholder="第一行为列标题
-例如：
+例如:
 姓名,年龄,分数,等级
 张三,25,92,A
 李四,28,88,B+
 王五,22,95,A+" style="min-height: 250px;"></textarea>
-                    
-                    <label style="margin-top: 20px;">表格注释（可选）：</label>
-                    <textarea id="tableNote" placeholder="例如：注：数据来源于2025年期末考试" style="min-height: 80px; margin-top: 10px;"></textarea>
+
+                    <label style="margin-top: 20px;">表格注释(可选):</label>
+                    <textarea id="tableNote" placeholder="例如:注:数据来源于2025年期末考试" style="min-height: 80px; margin-top: 10px;"></textarea>
                 </div>
             </div>
 
@@ -635,7 +683,7 @@
                 <h3>📊 图表选项</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
                     <div>
-                        <label>图表类型：</label>
+                        <label>图表类型:</label>
                         <select id="chartType" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
                             <option value="bar">柱状图</option>
                             <option value="line">折线图</option>
@@ -649,21 +697,21 @@
                         </select>
                     </div>
                     <div>
-                        <label>X轴列：</label>
+                        <label>X轴列:</label>
                         <select id="xAxisColumn" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
                             <option value="">请选择列</option>
                         </select>
                     </div>
                     <div>
-                        <label>Y轴列：</label>
+                        <label>Y轴列:</label>
                         <select id="yAxisColumn" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
                             <option value="">请选择列</option>
                         </select>
                     </div>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label>图表标题：</label>
-                    <input type="text" id="chartTitle" placeholder="例如：数据分布图" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
+                    <label>图表标题:</label>
+                    <input type="text" id="chartTitle" placeholder="例如:数据分布图" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;">
                 </div>
                 <div class="button-group" style="margin: 0;">
                     <button class="btn-primary" onclick="generateChart()">
@@ -688,7 +736,7 @@
             <!-- 预览区域 -->
             <div class="preview-section" id="previewSection" style="display: none;">
                 <h2 style="margin-bottom: 20px; color: #2c3e50;">📄 APA7 格式预览</h2>
-                
+
                 <div style="background: white; padding: 30px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div id="tableCaption" class="table-caption"></div>
                     <div id="apaPreview"></div>
@@ -713,7 +761,7 @@
             <!-- 图表预览区域 -->
             <div class="chart-preview-section" id="chartPreviewSection" style="display: none; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0;">
                 <h2 style="margin-bottom: 20px; color: #2c3e50;">📊 APA7 图表预览</h2>
-                
+
                 <div style="background: white; padding: 30px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div id="chartCaption" style="font-style: italic; margin-bottom: 15px; font-size: 14px;"></div>
                     <div style="max-width: 800px; margin: 0 auto;">
@@ -743,6 +791,11 @@
         let chartInstance = null;
         let chartCounter = 1;
 
+        // 多Sheet独立图表功能 - 全局变量
+        let sheetChartConfigs = {};      // 存储每个sheet的图表配置
+        let sheetChartInstances = {};    // 存储每个sheet的Chart实例
+        let currentActiveSheet = null;   // 当前激活的sheet名称
+
         // 切换选项卡
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -759,7 +812,7 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-        
+
         // 显示进度
         function updateProgress(percent) {
             const container = document.getElementById('progressContainer');
@@ -769,13 +822,13 @@
             fill.style.width = percent + '%';
             text.textContent = percent + '%';
         }
-        
+
         // 显示加载遮罩
         function showLoading(text) {
             document.getElementById('loadingText').textContent = text;
             document.getElementById('loadingOverlay').classList.add('active');
         }
-        
+
         // 隐藏加载遮罩
         function hideLoading() {
             document.getElementById('loadingOverlay').classList.remove('active');
@@ -808,7 +861,7 @@
             const fileName = document.getElementById('fileName');
             fileName.style.display = 'block';
             fileName.innerHTML = '✅ 已选择: ' + file.name;
-            
+
             const fileInfo = document.getElementById('fileInfo');
             fileInfo.classList.add('active');
             document.getElementById('fileInfoName').textContent = file.name;
@@ -824,7 +877,7 @@
             } else if (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls')) {
                 handleExcelFile(file);
             } else {
-                showStatus('error', '不支持的文件格式！请上传 CSV 或 Excel 文件。');
+                showStatus('error', '不支持的文件格式!请上传 CSV 或 Excel 文件。');
             }
         }
 
@@ -832,15 +885,15 @@
         function handleCSVFile(file) {
             showLoading('正在读取 CSV 文件...');
             updateProgress(0);
-            
+
             const reader = new FileReader();
-            
+
             reader.onprogress = function(e) {
                 if (e.lengthComputable) {
                     updateProgress(Math.round((e.loaded / e.total) * 100));
                 }
             };
-            
+
             reader.onload = function(e) {
                 updateProgress(100);
                 try {
@@ -848,20 +901,20 @@
                     document.getElementById('pasteInput').value = content;
                     switchTab('paste');
                     document.querySelector('.tab').click();
-                    showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
+                    showStatus('success', 'CSV 文件已加载!点击"转换为 APA7 格式"按钮。');
                 } catch (err) {
                     showStatus('error', 'CSV 读取失败: ' + err.message);
                 }
                 hideLoading();
                 hideProgress();
             };
-            
+
             reader.onerror = function() {
-                showStatus('error', 'CSV 文件读取失败，请重试。');
+                showStatus('error', 'CSV 文件读取失败,请重试。');
                 hideLoading();
                 hideProgress();
             };
-            
+
             reader.readAsText(file);
         }
 
@@ -869,59 +922,59 @@
         function handleExcelFile(file) {
             showLoading('正在解析 Excel 文件...');
             updateProgress(0);
-            
+
             const reader = new FileReader();
-            
+
             reader.onprogress = function(e) {
                 if (e.lengthComputable) {
                     updateProgress(Math.round((e.loaded / e.total) * 50));
                 }
             };
-            
+
             reader.onload = function(e) {
                 try {
                     updateProgress(60);
-                    
+
                     // 解析 Excel
                     const arrayBuffer = e.target.result;
                     const data = new Uint8Array(arrayBuffer);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
-                    
+
                     if (!currentWorkbook || !currentWorkbook.SheetNames || currentWorkbook.SheetNames.length === 0) {
-                        throw new Error('无法解析 Excel 文件，文件可能已损坏');
+                        throw new Error('无法解析 Excel 文件,文件可能已损坏');
                     }
-                    
+
                     updateProgress(80);
-                    
+
                     // 提取所有 sheet 数据
                     const sheetNames = currentWorkbook.SheetNames;
                     let sheetListHtml = '';
-                    
+
                     for (let i = 0; i < sheetNames.length; i++) {
                         const name = sheetNames[i];
                         const sheet = currentWorkbook.Sheets[name];
                         const csvData = XLSX.utils.sheet_to_csv(sheet);
                         multiSheetData[name] = csvData;
-                        
+
                         const rowCount = csvData.split('\n').filter(function(line) { return line.trim(); }).length;
                         sheetListHtml += '<div class="sheet-item" onclick="selectSheet(\'' + name + '\')">' + name + ' <span style="color:#666;font-size:11px;">(' + rowCount + ' 行)</span></div>';
                     }
-                    
+
                     updateProgress(100);
-                    
+
                     // 显示 sheet 选择器
                     document.getElementById('sheetList').innerHTML = sheetListHtml;
                     document.getElementById('sheetSelector').classList.add('active');
-                    
+
                     hideLoading();
                     hideProgress();
-                    
+
                     if (sheetNames.length === 1) {
                         selectSheet(sheetNames[0]);
                     } else {
-                        showStatus('success', 'Excel 文件包含 ' + sheetNames.length + ' 个 sheet，请选择要转换的 sheet。');
+                        showStatus('success', 'Excel 文件包含 ' + sheetNames.length + ' 个 sheet,请选择要转换的 sheet。');
                     }
-                    
+
                 } catch (err) {
                     console.error('Excel 解析错误:', err);
                     showStatus('error', 'Excel 解析失败: ' + err.message);
@@ -929,24 +982,98 @@
                     hideProgress();
                 }
             };
-            
+
             reader.onerror = function() {
-                showStatus('error', 'Excel 文件读取失败，请重试。');
+                showStatus('error', 'Excel 文件读取失败,请重试。');
                 hideLoading();
                 hideProgress();
             };
-            
+
             reader.readAsArrayBuffer(file);
+        }
+
+        // 配置管理函数 - 多Sheet独立图表功能
+
+        // 初始化Sheet的图表配置
+        function initSheetChartConfig(sheetName, data) {
+            if (!sheetChartConfigs[sheetName]) {
+                sheetChartConfigs[sheetName] = {
+                    chartType: 'bar',
+                    xAxisColumn: 0,
+                    yAxisColumn: data && data[0] && data[0].length > 1 ? 1 : 0,
+                    chartTitle: sheetName + ' 数据图表',
+                    data: data
+                };
+            }
+        }
+
+        // 保存当前Sheet的图表配置
+        function saveCurrentChartConfig() {
+            if (!currentActiveSheet) return;
+
+            const config = sheetChartConfigs[currentActiveSheet];
+            if (!config) return;
+
+            config.chartType = document.getElementById('sheetChartType').value;
+            config.xAxisColumn = parseInt(document.getElementById('sheetXAxisColumn').value) || 0;
+            config.yAxisColumn = parseInt(document.getElementById('sheetYAxisColumn').value) || 0;
+            config.chartTitle = document.getElementById('sheetChartTitle').value || currentActiveSheet + ' 数据图表';
+        }
+
+        // 加载Sheet的图表配置到UI
+        function loadSheetChartConfig(sheetName) {
+            const config = sheetChartConfigs[sheetName];
+            if (!config) return;
+
+            document.getElementById('sheetChartType').value = config.chartType;
+            document.getElementById('sheetXAxisColumn').value = config.xAxisColumn;
+            document.getElementById('sheetYAxisColumn').value = config.yAxisColumn;
+            document.getElementById('sheetChartTitle').value = config.chartTitle;
+        }
+
+        // 填充当前Sheet的列选择器
+        function populateSheetChartSelectors(data) {
+            const xSelect = document.getElementById('sheetXAxisColumn');
+            const ySelect = document.getElementById('sheetYAxisColumn');
+
+            // 保存当前值
+            const currentX = xSelect.value;
+            const currentY = ySelect.value;
+
+            xSelect.innerHTML = '<option value="">请选择列</option>';
+            ySelect.innerHTML = '<option value="">请选择列</option>';
+
+            if (!data || data.length === 0) return;
+
+            const headers = data[0];
+            headers.forEach(function(header, index) {
+                xSelect.innerHTML += '<option value="' + index + '">' + header + '</option>';
+                ySelect.innerHTML += '<option value="' + index + '">' + header + '</option>';
+            });
+
+            // 恢复之前的值(如果列数匹配)
+            if (currentX !== '' && parseInt(currentX) < headers.length) {
+                xSelect.value = currentX;
+            }
+            if (currentY !== '' && parseInt(currentY) < headers.length) {
+                ySelect.value = currentY;
+            }
         }
 
         // 选择 sheet
         function selectSheet(sheetName) {
+            // 1. 保存当前Sheet的配置(如果有)
+            if (currentActiveSheet) {
+                saveCurrentChartConfig();
+            }
+
+            // 2. 检查数据
             if (!multiSheetData[sheetName]) {
                 showStatus('error', 'Sheet 数据未找到');
                 return;
             }
-            
-            // 更新选中状态
+
+            // 3. 更新UI选中状态
             document.querySelectorAll('.sheet-item').forEach(function(item) {
                 if (item.textContent.includes(sheetName)) {
                     item.classList.add('selected');
@@ -954,13 +1081,44 @@
                     item.classList.remove('selected');
                 }
             });
-            
-            // 填充数据
-            document.getElementById('pasteInput').value = multiSheetData[sheetName];
+
+            // 4. 获取并解析数据
+            const csvData = multiSheetData[sheetName].rawCSV || multiSheetData[sheetName];
+            const parsedData = parseInputData(csvData);
+
+            // 5. 存储解析后的数据
+            multiSheetData[sheetName] = {
+                rawCSV: csvData,
+                parsedData: parsedData
+            };
+
+            // 6. 填充到输入框
+            document.getElementById('pasteInput').value = csvData;
+
+            // 7. 初始化图表配置
+            initSheetChartConfig(sheetName, parsedData);
+
+            // 8. 填充列选择器
+            populateSheetChartSelectors(parsedData);
+
+            // 9. 加载已保存的配置
+            loadSheetChartConfig(sheetName);
+
+            // 10. 更新当前激活Sheet
+            currentActiveSheet = sheetName;
+
+            // 11. 显示图表配置区
+            const configDiv = document.getElementById('sheetChartConfig');
+            if (configDiv) {
+                configDiv.style.display = 'block';
+                document.getElementById('currentSheetName').textContent = sheetName;
+            }
+
+            // 12. 切换标签页
             switchTab('paste');
             document.querySelector('.tab').click();
-            
-            showStatus('success', '已加载 sheet "' + sheetName + '"！点击"转换为 APA7 格式"按钮。');
+
+            showStatus('success', '已加载 sheet "' + sheetName + '"!图表配置已就绪。');
         }
 
         // 转换所有 sheet
@@ -985,12 +1143,21 @@
             
             for (let i = 0; i < sheetNames.length; i++) {
                 const sheetName = sheetNames[i];
-                const csvData = multiSheetData[sheetName];
+                const csvData = multiSheetData[sheetName].rawCSV || multiSheetData[sheetName];
                 
                 if (!csvData || !csvData.trim()) continue;
                 
                 const data = parseInputData(csvData);
                 if (data.length === 0) continue;
+                
+                // 存储解析后的数据
+                multiSheetData[sheetName] = {
+                    rawCSV: csvData,
+                    parsedData: data
+                };
+                
+                // 初始化图表配置
+                initSheetChartConfig(sheetName, data);
                 
                 // 生成标题
                 let caption;
@@ -1021,7 +1188,7 @@
             document.getElementById('apaPreview').innerHTML = allResults;
             
             hideLoading();
-            showStatus('success', '已转换 ' + count + ' 个 sheet！可以下载或复制。');
+            showStatus('success', '已转换 ' + count + ' 个 sheet！每个 sheet 的图表配置已初始化。');
             
             // 滚动到预览区域
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
@@ -1031,12 +1198,12 @@
         function parseInputData(input) {
             let lines = input.trim().split('\n');
             let delimiter = '\t';
-            
+
             if (lines[0].includes(',')) delimiter = ',';
             else if (lines[0].includes(';')) delimiter = ';';
             else if (lines[0].includes('\t')) delimiter = '\t';
-            
-            return lines.map(function(line) { 
+
+            return lines.map(function(line) {
                 return line.split(delimiter).map(function(cell) { return cell.trim(); });
             });
         }
@@ -1044,9 +1211,9 @@
         // 生成 APA 表格
         function generateAPATable(data, options) {
             if (data.length === 0) return '';
-            
+
             let html = '<table class="apa-table">';
-            
+
             // 表头
             if (data.length > 0) {
                 html += '<thead><tr>';
@@ -1077,7 +1244,7 @@
             return html;
         }
 
-        // 转换为 APA7 格式（单表格）
+        // 转换为 APA7 格式(单表格)
         function convertToAPA() {
             let data = [];
             let title = '';
@@ -1088,7 +1255,7 @@
             if (activeTab.includes('粘贴')) {
                 const input = document.getElementById('pasteInput').value;
                 if (!input.trim()) {
-                    showStatus('error', '请先输入表格数据！');
+                    showStatus('error', '请先输入表格数据!');
                     return;
                 }
                 data = parseInputData(input);
@@ -1097,19 +1264,19 @@
                 const input = document.getElementById('manualInput').value;
                 title = document.getElementById('tableTitle').value || '数据表格';
                 note = document.getElementById('tableNote').value;
-                
+
                 if (!input.trim()) {
-                    showStatus('error', '请先输入表格数据！');
+                    showStatus('error', '请先输入表格数据!');
                     return;
                 }
                 data = parseInputData(input);
             } else {
-                showStatus('error', '请先上传文件或输入数据！');
+                showStatus('error', '请先上传文件或输入数据!');
                 return;
             }
 
             if (data.length === 0) {
-                showStatus('error', '数据解析失败，请检查格式！');
+                showStatus('error', '数据解析失败,请检查格式!');
                 return;
             }
 
@@ -1127,7 +1294,7 @@
             // 显示预览
             document.getElementById('previewSection').style.display = 'block';
             document.getElementById('apaPreview').innerHTML = apaTable;
-            
+
             // 设置标题
             let captionDiv = document.getElementById('tableCaption');
             if (options.showNumber) {
@@ -1135,73 +1302,73 @@
             } else {
                 captionDiv.innerHTML = options.italicCaption ? '<em>' + title + '</em>' : title;
             }
-            
+
             // 添加注释
             if (note) {
                 document.getElementById('apaPreview').innerHTML += '<p style="font-style:italic;font-size:11px;margin-top:10px;">' + note + '</p>';
             }
 
-            showStatus('success', '✅ 转换成功！可以预览并下载。');
-            
+            showStatus('success', '✅ 转换成功!可以预览并下载。');
+
             // 填充图表选项的列选择器
             populateChartSelectors();
-            
+
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         // 下载为 Word 文档
         function downloadAsWord() {
             if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
-                showStatus('error', '请先转换表格！');
+                showStatus('error', '请先转换表格!');
                 return;
             }
 
             const title = document.getElementById('tableCaption').innerText;
             const table = document.getElementById('apaPreview').innerHTML;
-            
+
             const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12pt; } thead { border-top: 2pt solid black; border-bottom: 1pt solid black; } th { font-weight: bold; text-align: left; padding: 5pt; } td { padding: 5pt; text-align: left; } tfoot { border-top: 1pt solid black; border-bottom: 2pt solid black; } tfoot td { font-style: italic; font-size: 10pt; } .table-caption { font-style: italic; margin-bottom: 10pt; font-size: 12pt; }</style></head><body><div class="table-caption">' + title + '</div>' + table + '</body></html>';
 
             const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
             downloadBlob(blob, 'apa7-table.doc');
-            showStatus('success', '✅ Word 文档已下载！');
+            showStatus('success', '✅ Word 文档已下载!');
         }
 
         // 下载为 HTML
         function downloadAsHTML() {
             if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
-                showStatus('error', '请先转换表格！');
+                showStatus('error', '请先转换表格!');
                 return;
             }
 
             const title = document.getElementById('tableCaption').innerText;
             const table = document.getElementById('apaPreview').innerHTML;
-            
+
             const html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + title + '</title><style>body { font-family: "Times New Roman", Times, serif; padding: 20px; max-width: 800px; margin: 0 auto; } table { width: 100%; border-collapse: collapse; margin: 20px 0; } thead { border-top: 2px solid black; border-bottom: 1px solid black; } th { font-weight: bold; text-align: left; padding: 8px; } td { padding: 8px; text-align: left; } tfoot { border-top: 1px solid black; border-bottom: 2px solid black; } tfoot td { font-style: italic; font-size: 12px; padding: 8px; } .table-caption { font-style: italic; margin-bottom: 10px; font-size: 14px; }</style></head><body><div class="table-caption">' + title + '</div>' + table + '</body></html>';
 
             const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
             downloadBlob(blob, 'apa7-table.html');
-            showStatus('success', '✅ HTML 文件已下载！');
+            showStatus('success', '✅ HTML 文件已下载!');
         }
 
         // 下载为 Excel 文件
         function downloadAsExcel() {
             if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
-                showStatus('error', '请先转换表格！');
+                showStatus('error', '请先转换表格!');
                 return;
             }
 
             try {
                 const workbook = XLSX.utils.book_new();
-                
+
                 // 检查是否是多 sheet 转换
                 const tableBlocks = document.querySelectorAll('.table-block');
-                
+
                 if (tableBlocks.length > 0) {
                     // 多 sheet 模式
                     tableBlocks.forEach(function(block, index) {
                         const table = block.querySelector('.apa-table');
                         if (!table) return;
-                        
+
                         // 提取表格数据
                         const sheetData = [];
                         const caption = block.querySelector('.table-caption');
@@ -1209,7 +1376,7 @@
                             sheetData.push([caption.innerText]);
                             sheetData.push([]); // 空行
                         }
-                        
+
                         // 提取表头
                         const headers = table.querySelectorAll('thead th');
                         const headerRow = [];
@@ -1217,7 +1384,7 @@
                             headerRow.push(th.innerText);
                         });
                         sheetData.push(headerRow);
-                        
+
                         // 提取数据行
                         const rows = table.querySelectorAll('tbody tr');
                         rows.forEach(function(row) {
@@ -1227,17 +1394,17 @@
                             });
                             sheetData.push(rowData);
                         });
-                        
+
                         // 创建工作表
                         const ws = XLSX.utils.aoa_to_sheet(sheetData);
-                        
+
                         // 设置列宽
                         const colWidths = [];
                         headerRow.forEach(function() {
                             colWidths.push({ wch: 15 });
                         });
                         ws['!cols'] = colWidths;
-                        
+
                         // 添加到工作簿
                         const sheetName = '表格' + (index + 1);
                         XLSX.utils.book_append_sheet(workbook, ws, sheetName);
@@ -1245,23 +1412,23 @@
                 } else {
                     // 单表格模式
                     const sheetData = [];
-                    
+
                     // 添加标题
                     const caption = document.getElementById('tableCaption').innerText;
                     if (caption) {
                         sheetData.push([caption]);
                         sheetData.push([]); // 空行
                     }
-                    
+
                     // 添加数据
                     if (currentData.length > 0) {
                         currentData.forEach(function(row) {
                             sheetData.push(row);
                         });
                     }
-                    
+
                     const ws = XLSX.utils.aoa_to_sheet(sheetData);
-                    
+
                     // 设置列宽
                     const colWidths = [];
                     if (currentData[0]) {
@@ -1270,14 +1437,14 @@
                         });
                     }
                     ws['!cols'] = colWidths;
-                    
+
                     XLSX.utils.book_append_sheet(workbook, ws, 'APA表格');
                 }
-                
+
                 // 下载
                 XLSX.writeFile(workbook, 'apa7-tables.xlsx');
-                showStatus('success', '✅ Excel 文件已下载！');
-                
+                showStatus('success', '✅ Excel 文件已下载!');
+
             } catch (err) {
                 console.error('Excel 导出错误:', err);
                 showStatus('error', 'Excel 导出失败: ' + err.message);
@@ -1291,14 +1458,14 @@
             range.selectNode(preview);
             window.getSelection().removeAllRanges();
             window.getSelection().addRange(range);
-            
+
             try {
                 document.execCommand('copy');
-                showStatus('success', '✅ 表格已复制到剪贴板！可以直接粘贴到 Word 中。');
+                showStatus('success', '✅ 表格已复制到剪贴板!可以直接粘贴到 Word 中。');
             } catch (err) {
-                showStatus('error', '复制失败，请手动选择并复制。');
+                showStatus('error', '复制失败,请手动选择并复制。');
             }
-            
+
             window.getSelection().removeAllRanges();
         }
 
@@ -1335,6 +1502,24 @@
             currentData = [];
             multiSheetData = {};
             currentWorkbook = null;
+
+            // 清理多Sheet图表配置和实例
+            sheetChartConfigs = {};
+            sheetChartInstances = {};
+            currentActiveSheet = null;
+
+            // 清理图表配置区域
+            const configDiv = document.getElementById('sheetChartConfig');
+            if (configDiv) {
+                configDiv.style.display = 'none';
+            }
+            const xSelect = document.getElementById('sheetXAxisColumn');
+            const ySelect = document.getElementById('sheetYAxisColumn');
+            if (xSelect) xSelect.innerHTML = '<option value="">请选择列</option>';
+            if (ySelect) ySelect.innerHTML = '<option value="">请选择列</option>';
+            const titleInput = document.getElementById('sheetChartTitle');
+            if (titleInput) titleInput.value = '';
+
             showStatus('success', '已清空所有内容。');
         }
 
@@ -1351,14 +1536,14 @@
         // 填充图表列选择器
         function populateChartSelectors() {
             if (currentData.length === 0) return;
-            
+
             const xAxisSelect = document.getElementById('xAxisColumn');
             const yAxisSelect = document.getElementById('yAxisColumn');
-            
+
             // 清空现有选项
             xAxisSelect.innerHTML = '<option value="">请选择列</option>';
             yAxisSelect.innerHTML = '<option value="">请选择列</option>';
-            
+
             // 添加列选项
             const headers = currentData[0];
             headers.forEach(function(header, index) {
@@ -1366,13 +1551,13 @@
                 option1.value = index;
                 option1.textContent = header;
                 xAxisSelect.appendChild(option1);
-                
+
                 const option2 = document.createElement('option');
                 option2.value = index;
                 option2.textContent = header;
                 yAxisSelect.appendChild(option2);
             });
-            
+
             // 显示图表选项区域
             document.getElementById('chartOptions').style.display = 'block';
         }
@@ -1383,46 +1568,46 @@
             const xColIndex = document.getElementById('xAxisColumn').value;
             const yColIndex = document.getElementById('yAxisColumn').value;
             const chartTitleText = document.getElementById('chartTitle').value || '数据图表';
-            
+
             if (xColIndex === '' || yColIndex === '') {
-                showStatus('error', '请选择 X 轴和 Y 轴列！');
+                showStatus('error', '请选择 X 轴和 Y 轴列!');
                 return;
             }
-            
+
             if (currentData.length <= 1) {
-                showStatus('error', '数据不足，无法生成图表！');
+                showStatus('error', '数据不足,无法生成图表!');
                 return;
             }
-            
+
             // 提取数据
             const labels = [];
             const values = [];
-            
+
             for (let i = 1; i < currentData.length; i++) {
                 labels.push(currentData[i][xColIndex]);
                 const val = parseFloat(currentData[i][yColIndex]);
                 values.push(isNaN(val) ? 0 : val);
             }
-            
+
             // 销毁旧图表
             if (chartInstance) {
                 chartInstance.destroy();
             }
-            
+
             // 生成 APA7 标题
             const showNumber = document.getElementById('showNumber').checked;
             const italicCaption = document.getElementById('italicCaption').checked;
-            
+
             let captionHtml = '';
             if (showNumber) {
                 captionHtml = '<strong>图 ' + chartCounter + '</strong> ';
             }
             captionHtml += italicCaption ? '<em>' + chartTitleText + '</em>' : chartTitleText;
             document.getElementById('chartCaption').innerHTML = captionHtml;
-            
+
             // 创建图表
             const ctx = document.getElementById('chartCanvas').getContext('2d');
-            
+
             const config = {
                 type: chartType,
                 data: {
@@ -1491,35 +1676,203 @@
                     } : {}
                 }
             };
-            
+
             chartInstance = new Chart(ctx, config);
-            
+
             // 显示预览区域
             document.getElementById('chartPreviewSection').style.display = 'block';
             document.getElementById('chartPreviewSection').scrollIntoView({ behavior: 'smooth' });
-            
-            showStatus('success', '✅ 图表生成成功！可以下载为 PNG。');
-            
+
+            showStatus('success', '✅ 图表生成成功!可以下载为 PNG。');
+
             chartCounter++;
         }
 
-        // 下载图表
-        function downloadChart() {
-            if (!chartInstance) {
-                showStatus('error', '请先生成图表！');
+        // 为当前Sheet生成图表 - 多Sheet独立图表功能
+        function generateSheetChart() {
+            if (!currentActiveSheet) {
+                showStatus('error', '请先选择一个 Sheet!');
                 return;
             }
-            
+
+            saveCurrentChartConfig();
+            const config = sheetChartConfigs[currentActiveSheet];
+            const data = config.data;
+
+            if (!data || data.length <= 1) {
+                showStatus('error', '数据不足,无法生成图表!');
+                return;
+            }
+
+            const xCol = config.xAxisColumn;
+            const yCol = config.yAxisColumn;
+
+            if (xCol === null || xCol === '' || yCol === null || yCol === '') {
+                showStatus('error', '请选择 X 轴和 Y 轴列!');
+                return;
+            }
+
+            // 提取图表数据
+            const labels = [];
+            const values = [];
+
+            for (let i = 1; i < data.length; i++) {
+                labels.push(data[i][xCol]);
+                const val = parseFloat(data[i][yCol]);
+                values.push(isNaN(val) ? 0 : val);
+            }
+
+            // 销毁旧图表实例
+            if (sheetChartInstances[currentActiveSheet]) {
+                sheetChartInstances[currentActiveSheet].destroy();
+            }
+
+            // 获取图表颜色
+            const colors = [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(118, 75, 162, 0.8)',
+                'rgba(52, 152, 219, 0.8)',
+                'rgba(46, 204, 113, 0.8)',
+                'rgba(241, 196, 15, 0.8)',
+                'rgba(231, 76, 60, 0.8)',
+                'rgba(155, 89, 182, 0.8)',
+                'rgba(26, 188, 156, 0.8)',
+                'rgba(230, 126, 34, 0.8)',
+                'rgba(149, 165, 166, 0.8)'
+            ];
+
+            const backgroundColor = (config.chartType === 'pie' || config.chartType === 'doughnut' || config.chartType === 'polarArea')
+                ? colors
+                : colors[0];
+
+            // 创建图表配置
+            const chartConfig = {
+                type: config.chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: data[0][yCol],
+                        data: values,
+                        backgroundColor: backgroundColor,
+                        borderColor: config.chartType === 'line' ? 'rgba(102, 126, 234, 1)' : 'rgba(255, 255, 255, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: config.chartType === 'pie' || config.chartType === 'doughnut',
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 12
+                                }
+                            }
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: (config.chartType !== 'pie' && config.chartType !== 'doughnut') ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    } : {}
+                }
+            };
+
+            // 显示图表预览区域
+            const previewSection = document.getElementById('chartPreviewSection');
+            previewSection.style.display = 'block';
+
+            // 设置图表标题
+            const chartCaption = document.getElementById('chartCaption');
+            const showNumber = document.getElementById('showNumber').checked;
+            const italicCaption = document.getElementById('italicCaption').checked;
+
+            let captionHtml = '';
+            if (showNumber) {
+                captionHtml = '<strong>图 ' + (Object.keys(sheetChartInstances).length + 1) + '</strong> ';
+            }
+            captionHtml += italicCaption ? '<em>' + config.chartTitle + '</em>' : config.chartTitle;
+            chartCaption.innerHTML = captionHtml;
+
+            // 创建图表
+            const canvas = document.getElementById('chartCanvas');
+            const ctx = canvas.getContext('2d');
+            sheetChartInstances[currentActiveSheet] = new Chart(ctx, chartConfig);
+
+            // 更新全局chartInstance以便兼容单表格模式的下载功能
+            chartInstance = sheetChartInstances[currentActiveSheet];
+
+            // 滚动到图表
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+
+            showStatus('success', '✅ Sheet "' + currentActiveSheet + '" 的图表已生成!');
+        }
+
+        // 下载当前Sheet的图表 - 多Sheet独立图表功能
+        function downloadSheetChart() {
+            if (!currentActiveSheet || !sheetChartInstances[currentActiveSheet]) {
+                showStatus('error', '请先生成当前 Sheet 的图表!');
+                return;
+            }
+
             const canvas = document.getElementById('chartCanvas');
             const url = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'apa7-chart.png';
+            a.download = currentActiveSheet + '-chart.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            
-            showStatus('success', '✅ 图表已下载为 PNG！');
+
+            showStatus('success', '✅ 图表已下载!');
+        }
+
+        // 下载图表
+        function downloadChart() {
+            // 判断是单表格模式还是多Sheet模式
+            if (currentActiveSheet && sheetChartInstances[currentActiveSheet]) {
+                // 多Sheet模式:下载当前Sheet的图表
+                downloadSheetChart();
+            } else if (chartInstance) {
+                // 单表格模式:使用原有逻辑
+                const canvas = document.getElementById('chartCanvas');
+                const url = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'apa7-chart.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showStatus('success', '✅ 图表已下载为 PNG!');
+            } else {
+                showStatus('error', '请先生成图表!');
+            }
         }
     </script>
 </body>
