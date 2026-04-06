@@ -691,9 +691,9 @@
             if (file.name.endsWith('.csv')) {
                 reader.onload = function(e) {
                     updateProgress(100);
-                    setTimeout(() => {
-                        const text = e.target.result;
-                        document.getElementById('pasteInput').value = text;
+                    const result = e.target.result; // 先保存结果
+                    setTimeout(function() {
+                        document.getElementById('pasteInput').value = result;
                         switchTab('paste');
                         document.querySelector('.tab').click();
                         showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
@@ -704,9 +704,10 @@
             } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
                 reader.onload = function(e) {
                     updateProgress(100);
-                    setTimeout(() => {
+                    const arrayBuffer = e.target.result; // 先保存结果
+                    setTimeout(function() {
                         try {
-                            const data = new Uint8Array(e.target.result);
+                            const data = new Uint8Array(arrayBuffer);
                             const workbook = XLSX.read(data, {type: 'array'});
                             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                             const csvData = XLSX.utils.sheet_to_csv(firstSheet);
