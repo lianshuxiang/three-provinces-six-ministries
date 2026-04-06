@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-04-06T07:32:43.383Z",
+  "timestamp": "2026-04-06T09:01:41.031Z",
   "system": {
     "name": "三省六部 Agent 系统",
     "version": "1.0.0",
-    "files": 981,
+    "files": 1008,
     "status": "operational",
-    "uptime": 0.058839905
+    "uptime": 0.078268412
   },
   "rules": {
     "total": 6,
