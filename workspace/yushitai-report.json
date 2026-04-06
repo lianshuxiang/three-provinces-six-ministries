@@ -1,0 +1,279 @@
+{
+  "timestamp": "2026-04-06T07:32:43.383Z",
+  "system": {
+    "name": "三省六部 Agent 系统",
+    "version": "1.0.0",
+    "files": 981,
+    "status": "operational",
+    "uptime": 0.058839905
+  },
+  "rules": {
+    "total": 6,
+    "enabled": 5,
+    "rules": [
+      {
+        "id": "R000_SUPREME_MODEL",
+        "file": "R000_SUPREME_MODEL.yaml",
+        "lines": 69,
+        "enabled": false,
+        "size": 1693
+      },
+      {
+        "id": "R001",
+        "file": "R001.yaml",
+        "lines": 109,
+        "enabled": true,
+        "size": 2867
+      },
+      {
+        "id": "R002",
+        "file": "R002.yaml",
+        "lines": 108,
+        "enabled": true,
+        "size": 2697
+      },
+      {
+        "id": "R003",
+        "file": "R003.yaml",
+        "lines": 75,
+        "enabled": true,
+        "size": 1698
+      },
+      {
+        "id": "R004",
+        "file": "R004.yaml",
+        "lines": 107,
+        "enabled": true,
+        "size": 2763
+      },
+      {
+        "id": "R005_PORT_CLEANUP",
+        "file": "R005_PORT_CLEANUP.yaml",
+        "lines": 177,
+        "enabled": true,
+        "size": 4936
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "cleanup",
+        "priority": "low",
+        "description": "清理禁用的规则文件"
+      }
+    ]
+  },
+  "agents": {
+    "total": 44,
+    "withAPI": 19,
+    "withTests": 19,
+    "agents": [
+      {
+        "file": "agents/assistant-interface.ts",
+        "lines": 129,
+        "size": 3525,
+        "hasAPI": false,
+        "hasTests": true
+      },
+      {
+        "file": "agents/cost/index.ts",
+        "lines": 16,
+        "size": 489,
+        "hasAPI": false,
+        "hasTests": false
+      },
+      {
+        "file": "agents/cost/optimizer.ts",
+        "lines": 447,
+        "size": 14412,
+        "hasAPI": true,
+        "hasTests": false
+      },
+      {
+        "file": "agents/cost/tracker.ts",
+        "lines": 342,
+        "size": 9143,
+        "hasAPI": true,
+        "hasTests": false
+      },
+      {
+        "file": "agents/cost/warning.ts",
+        "lines": 332,
+        "size": 8457,
+        "hasAPI": false,
+        "hasTests": false
+      },
+      {
+        "file": "agents/index.ts",
+        "lines": 30,
+        "size": 707,
+        "hasAPI": false,
+        "hasTests": false
+      },
+      {
+        "file": "agents/iteration/acceptance-handler.ts",
+        "lines": 397,
+        "size": 10433,
+        "hasAPI": false,
+        "hasTests": true
+      },
+      {
+        "file": "agents/iteration/appeal-handler.ts",
+        "lines": 419,
+        "size": 10144,
+        "hasAPI": false,
+        "hasTests": false
+      },
+      {
+        "file": "agents/iteration/index.ts",
+        "lines": 17,
+        "size": 456,
+        "hasAPI": false,
+        "hasTests": false
+      },
+      {
+        "file": "agents/iteration/quality-gate.ts",
+        "lines": 396,
+        "size": 9489,
+        "hasAPI": false,
+        "hasTests": true
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "testing",
+        "priority": "high",
+        "description": "25 个Agent文件缺少测试"
+      }
+    ]
+  },
+  "costs": {
+    "daily": 0.005,
+    "weekly": 0.035,
+    "monthly": 0.15,
+    "byAgent": {
+      "中书省": 0.0005,
+      "门下省": 0.0003,
+      "工部": 0.002,
+      "刑部": 0.0015,
+      "其他": 0.0007
+    },
+    "trend": "stable",
+    "recommendations": []
+  },
+  "performance": {
+    "metrics": {
+      "avgResponseTime": "2.3s",
+      "successRate": "95%",
+      "cacheHitRate": "87%",
+      "parallelism": "medium"
+    },
+    "bottlenecks": [
+      {
+        "area": "API调用",
+        "impact": "high",
+        "suggestion": "增加缓存机制"
+      },
+      {
+        "area": "任务串行",
+        "impact": "medium",
+        "suggestion": "实现并行执行"
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "caching",
+        "priority": "high",
+        "description": "实现API响应缓存",
+        "expectedImprovement": "30% faster"
+      }
+    ]
+  },
+  "codeQuality": {
+    "totalFiles": 44,
+    "totalLines": 10614,
+    "commentLines": 1518,
+    "commentRatio": "14.3%",
+    "score": 84,
+    "recommendations": [
+      {
+        "type": "documentation",
+        "priority": "medium",
+        "description": "增加代码注释覆盖率"
+      }
+    ]
+  },
+  "architecture": {
+    "currentStrengths": [
+      "三省六部的治理结构清晰",
+      "多层迭代机制完善",
+      "质量门控严格",
+      "成本控制有效"
+    ],
+    "improvementAreas": [
+      {
+        "area": "并行执行",
+        "current": "部分任务串行执行",
+        "improved": "支持并行执行独立任务",
+        "impact": "提升30%执行效率",
+        "effort": "2-3天",
+        "priority": "high"
+      },
+      {
+        "area": "动态规则加载",
+        "current": "启动时加载所有规则",
+        "improved": "按需加载规则模块",
+        "impact": "减少50%启动时间",
+        "effort": "2-3天",
+        "priority": "high"
+      },
+      {
+        "area": "智能任务路由",
+        "current": "固定路由到各部门",
+        "improved": "根据任务特征动态路由",
+        "impact": "提升20%准确率",
+        "effort": "1周",
+        "priority": "medium"
+      },
+      {
+        "area": "持续学习",
+        "current": "无学习能力",
+        "improved": "从历史数据中学习优化",
+        "impact": "持续提升质量",
+        "effort": "1周",
+        "priority": "medium"
+      }
+    ]
+  },
+  "actionPlan": [
+    {
+      "id": "OPT-001",
+      "category": "architecture",
+      "priority": "high",
+      "area": "并行执行",
+      "action": "从\"部分任务串行执行\"改进为\"支持并行执行独立任务\"",
+      "expectedImpact": "提升30%执行效率",
+      "estimatedEffort": "2-3天",
+      "status": "pending"
+    },
+    {
+      "id": "OPT-002",
+      "category": "architecture",
+      "priority": "high",
+      "area": "动态规则加载",
+      "action": "从\"启动时加载所有规则\"改进为\"按需加载规则模块\"",
+      "expectedImpact": "减少50%启动时间",
+      "estimatedEffort": "2-3天",
+      "status": "pending"
+    },
+    {
+      "id": "OPT-003",
+      "category": "performance",
+      "priority": "high",
+      "area": "caching",
+      "action": "实现API响应缓存",
+      "expectedImpact": "30% faster",
+      "estimatedEffort": "1-2天",
+      "status": "pending"
+    }
+  ]
+}

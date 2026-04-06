@@ -1,0 +1,176 @@
+# R005 端口和进程清理规则
+# 用途：测试完成后自动清理临时开启的端口和进程
+
+id: R005_PORT_CLEANUP
+name: 端口和进程清理规则
+description: 测试完成后，自动清理新增的端口和服务器进程，避免资源浪费
+category: resource_management
+priority: 50
+version: 1.0.0
+enabled: true
+
+# 规则配置
+config:
+  # 触发条件
+  trigger:
+    events:
+      - task_completed      # 任务完成时
+      - test_finished       # 测试完成时
+      - user_request        # 用户请求清理时
+    
+    # 自动清理条件
+    autoCleanup:
+      enabled: true
+      delay: 30              # 任务完成后 30 秒自动清理
+      notifyUser: true       # 通知用户
+    
+    # 需要清理的资源类型
+    resourceTypes:
+      - temporary_servers    # 临时服务器
+      - test_ports          # 测试端口
+      - background_processes # 后台进程
+      - temporary_files     # 临时文件
+    
+    # 排除条件（不清理的资源）
+    exclusions:
+      - production_services   # 生产环境服务
+      - user_marked_keep      # 用户标记保留的
+      - long_running_tasks    # 长期运行任务
+
+  # 清理策略
+  cleanupStrategy:
+    # 端口清理
+    ports:
+      - 3000-3999            # 测试用端口范围
+      - 8000-8999            # 备用测试端口
+      - 5000-5999            # 开发服务器端口
+    
+    # 进程清理
+    processes:
+      - node                 # Node.js 进程
+      - python              # Python 进程
+      - http-server         # HTTP 服务器
+      - serve               # 静态服务器
+    
+    # 文件清理
+    files:
+      - "*.test.js"         # 测试文件
+      - "test-*.js"         # 测试脚本
+      - "*.tmp"             # 临时文件
+      - "/tmp/server.log"   # 服务器日志
+      - "/tmp/server.pid"   # 进程 ID 文件
+
+  # 验证机制
+  validation:
+    # 清理前检查
+    preCheck:
+      - confirm_not_production    # 确认不是生产环境
+      - check_dependencies        # 检查是否有依赖进程
+      - user_confirmation         # 关键资源需要用户确认
+    
+    # 清理后验证
+    postCheck:
+      - verify_port_closed        # 验证端口已关闭
+      - verify_process_killed     # 验证进程已终止
+      - verify_files_removed      # 验证文件已删除
+
+  # 通知配置
+  notification:
+    enabled: true
+    channels:
+      - console            # 控制台输出
+      - user_message       # 用户消息
+    
+    templates:
+      before: "🧹 即将清理测试资源（进程 {pid}，端口 {port}）"
+      after: "✅ 清理完成（释放了 {count} 个资源）"
+      error: "⚠️ 清理失败：{error}"
+
+  # 成本影响
+  costImpact:
+    savings:
+      cpu: "释放 CPU 资源"
+      memory: "释放内存占用"
+      ports: "释放端口资源"
+    
+    estimatedSaving: "$0.001/次"  # 避免资源浪费的价值
+
+  # 执行规则
+  execution:
+    mode: "automatic"      # automatic | manual | hybrid
+    timeout: 10            # 清理操作超时时间（秒）
+    retryAttempts: 2       # 失败重试次数
+    
+    # 清理步骤
+    steps:
+      - name: "识别资源"
+        action: "identify"
+        description: "扫描所有测试相关的端口和进程"
+      
+      - name: "验证安全性"
+        action: "validate"
+        description: "确认资源可以安全清理"
+      
+      - name: "终止进程"
+        action: "kill_processes"
+        command: "kill -15 {pid}"
+        fallback: "kill -9 {pid}"
+      
+      - name: "清理文件"
+        action: "remove_files"
+        command: "rm -f {files}"
+      
+      - name: "验证清理"
+        action: "verify"
+        description: "确认资源已完全释放"
+
+  # 审计
+  audit:
+    enabled: true
+    logFile: "/var/log/openclaw/cleanup.log"
+    retention: 30           # 保留 30 天
+    
+    fields:
+      - timestamp
+      - resource_type
+      - resource_id
+      - action
+      - result
+      - user
+
+  # 例子
+  examples:
+    - description: "测试完成后自动清理 HTTP 服务器"
+      trigger: "task_completed"
+      resources:
+        - type: "process"
+          pid: 32033
+          port: 3000
+          command: "node simple-server.js"
+      actions:
+        - "kill 32033"
+        - "验证端口 3000 已关闭"
+        - "删除 /tmp/server.log"
+      
+    - description: "用户手动清理所有测试进程"
+      trigger: "user_request"
+      command: "cleanup all test resources"
+      actions:
+        - "扫描所有 node 进程"
+        - "终止测试相关的进程"
+        - "清理临时文件"
+
+# 元数据
+metadata:
+  author: "user_request"
+  created: "2026-04-05T11:53:00Z"
+  lastModified: "2026-04-05T11:53:00Z"
+  tags:
+    - cleanup
+    - resource-management
+    - testing
+    - automation
+  
+  references:
+    - "R000_SUPREME_MODEL"  # 必须使用 GLM-5
+    - "R001"                # 成本控制规则
