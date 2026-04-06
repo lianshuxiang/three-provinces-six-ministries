@@ -318,7 +318,7 @@
             font-weight: normal;
         }
 
-        /* 上传进度样式 */
+        /* 进度条样式 */
         .progress-container {
             margin-top: 15px;
             display: none;
@@ -376,7 +376,51 @@
             color: #666;
             font-size: 12px;
         }
+
+        /* Sheet 选择器 */
+        .sheet-selector {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            display: none;
+        }
         
+        .sheet-selector.active {
+            display: block;
+        }
+        
+        .sheet-selector h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .sheet-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .sheet-item {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sheet-item:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .sheet-item.selected {
+            background: #667eea;
+            color: white;
+        }
+
         /* 加载动画 */
         .loading-overlay {
             position: fixed;
@@ -420,7 +464,21 @@
             color: #333;
             font-size: 16px;
         }
-        
+
+        /* 多表格预览 */
+        .table-block {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .table-block-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
         @media (max-width: 768px) {
             .button-group {
                 flex-direction: column;
@@ -462,6 +520,7 @@
                     <li>只使用水平线，不使用垂直线</li>
                     <li>列标题<strong>加粗</strong></li>
                     <li>表格注释在表格下方，<em>斜体</em></li>
+                    <li><strong>支持多 Sheet Excel 文件！</strong></li>
                 </ul>
             </div>
 
@@ -497,7 +556,7 @@
                     <div class="file-upload">
                         <div class="file-upload-btn">
                             <p>📁 点击或拖拽文件到此处</p>
-                            <p style="font-size: 12px; color: #666; margin-top: 10px;">支持 .csv, .xlsx, .xls 格式</p>
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">支持 .csv, .xlsx, .xls 格式 | 支持多 Sheet</p>
                         </div>
                         <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(event)">
                     </div>
@@ -516,6 +575,15 @@
                         <span>📄</span>
                         <span id="fileInfoName"></span>
                         <span class="size" id="fileInfoSize"></span>
+                    </div>
+                    
+                    <!-- Sheet 选择器 -->
+                    <div class="sheet-selector" id="sheetSelector">
+                        <h4>📑 选择要转换的 Sheet：</h4>
+                        <div class="sheet-list" id="sheetList"></div>
+                        <button class="btn-primary" style="padding: 10px 20px;" onclick="convertAllSheets()">
+                            🔄 转换所有 Sheet 为 APA 格式
+                        </button>
                     </div>
                 </div>
             </div>
@@ -605,16 +673,15 @@
     <script>
         let currentData = [];
         let tableCounter = 1;
+        let multiSheetData = {};
+        let currentWorkbook = null;
 
         // 切换选项卡
         function switchTab(tabName) {
-            // 移除所有活动状态
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // 激活选中的选项卡
             event.target.classList.add('active');
-            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
         }
 
         // 格式化文件大小
@@ -631,7 +698,6 @@
             const container = document.getElementById('progressContainer');
             const fill = document.getElementById('progressFill');
             const text = document.getElementById('progressText');
-            
             container.classList.add('active');
             fill.style.width = percent + '%';
             text.textContent = percent + '%';
@@ -647,12 +713,23 @@
         function hideLoading() {
             document.getElementById('loadingOverlay').classList.remove('active');
         }
-        
+
         // 隐藏进度
         function hideProgress() {
             document.getElementById('progressContainer').classList.remove('active');
             document.getElementById('progressFill').style.width = '0%';
             document.getElementById('progressText').textContent = '0%';
+        }
+
+        // 显示状态
+        function showStatus(type, message) {
+            const status = document.getElementById('status');
+            status.className = 'status ' + type;
+            status.textContent = message;
+            status.style.display = 'block';
+            setTimeout(function() {
+                status.style.display = 'none';
+            }, 5000);
         }
 
         // 处理文件上传
@@ -663,100 +740,282 @@
             // 显示文件信息
             const fileName = document.getElementById('fileName');
             fileName.style.display = 'block';
-            fileName.innerHTML = `✅ 已选择: ${file.name}`;
+            fileName.innerHTML = '✅ 已选择: ' + file.name;
             
             const fileInfo = document.getElementById('fileInfo');
             fileInfo.classList.add('active');
             document.getElementById('fileInfoName').textContent = file.name;
             document.getElementById('fileInfoSize').textContent = formatFileSize(file.size);
 
-            const reader = new FileReader();
-            
-            // 进度回调
-            reader.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    updateProgress(percent);
-                }
-            };
-            
-            // 开始加载动画
-            reader.onloadstart = function() {
-                updateProgress(0);
-                if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                    showLoading('正在解析 Excel 文件...');
-                }
-            };
-            
-            if (file.name.endsWith('.csv')) {
-                reader.onload = function(e) {
-                    updateProgress(100);
-                    const result = e.target.result; // 先保存结果
-                    setTimeout(function() {
-                        document.getElementById('pasteInput').value = result;
-                        switchTab('paste');
-                        document.querySelector('.tab').click();
-                        showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
-                        hideProgress();
-                    }, 300);
-                };
-                reader.readAsText(file);
-            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                reader.onload = function(e) {
-                    updateProgress(100);
-                    const arrayBuffer = e.target.result; // 先保存结果
-                    setTimeout(function() {
-                        try {
-                            const data = new Uint8Array(arrayBuffer);
-                            const workbook = XLSX.read(data, {type: 'array'});
-                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const csvData = XLSX.utils.sheet_to_csv(firstSheet);
-                            document.getElementById('pasteInput').value = csvData;
-                            switchTab('paste');
-                            document.querySelector('.tab').click();
-                            showStatus('success', 'Excel 文件已加载！点击"转换为 APA7 格式"按钮。');
-                        } catch (err) {
-                            showStatus('error', 'Excel 解析失败: ' + err.message);
-                        }
-                        hideLoading();
-                        hideProgress();
-                    }, 100);
-                };
-                reader.readAsArrayBuffer(file);
+            // 清空之前的数据
+            multiSheetData = {};
+            currentWorkbook = null;
+            document.getElementById('sheetSelector').classList.remove('active');
+
+            if (file.name.toLowerCase().endsWith('.csv')) {
+                handleCSVFile(file);
+            } else if (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls')) {
+                handleExcelFile(file);
             } else {
                 showStatus('error', '不支持的文件格式！请上传 CSV 或 Excel 文件。');
-                hideProgress();
             }
+        }
+
+        // 处理 CSV 文件
+        function handleCSVFile(file) {
+            showLoading('正在读取 CSV 文件...');
+            updateProgress(0);
             
-            // 错误处理
-            reader.onerror = function() {
-                showStatus('error', '文件读取失败，请重试。');
+            const reader = new FileReader();
+            
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    updateProgress(Math.round((e.loaded / e.total) * 100));
+                }
+            };
+            
+            reader.onload = function(e) {
+                updateProgress(100);
+                try {
+                    const content = e.target.result;
+                    document.getElementById('pasteInput').value = content;
+                    switchTab('paste');
+                    document.querySelector('.tab').click();
+                    showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
+                } catch (err) {
+                    showStatus('error', 'CSV 读取失败: ' + err.message);
+                }
                 hideLoading();
                 hideProgress();
             };
+            
+            reader.onerror = function() {
+                showStatus('error', 'CSV 文件读取失败，请重试。');
+                hideLoading();
+                hideProgress();
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // 处理 Excel 文件
+        function handleExcelFile(file) {
+            showLoading('正在解析 Excel 文件...');
+            updateProgress(0);
+            
+            const reader = new FileReader();
+            
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    updateProgress(Math.round((e.loaded / e.total) * 50));
+                }
+            };
+            
+            reader.onload = function(e) {
+                try {
+                    updateProgress(60);
+                    
+                    // 解析 Excel
+                    const arrayBuffer = e.target.result;
+                    const data = new Uint8Array(arrayBuffer);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+                    
+                    if (!currentWorkbook || !currentWorkbook.SheetNames || currentWorkbook.SheetNames.length === 0) {
+                        throw new Error('无法解析 Excel 文件，文件可能已损坏');
+                    }
+                    
+                    updateProgress(80);
+                    
+                    // 提取所有 sheet 数据
+                    const sheetNames = currentWorkbook.SheetNames;
+                    let sheetListHtml = '';
+                    
+                    for (let i = 0; i < sheetNames.length; i++) {
+                        const name = sheetNames[i];
+                        const sheet = currentWorkbook.Sheets[name];
+                        const csvData = XLSX.utils.sheet_to_csv(sheet);
+                        multiSheetData[name] = csvData;
+                        
+                        const rowCount = csvData.split('\n').filter(function(line) { return line.trim(); }).length;
+                        sheetListHtml += '<div class="sheet-item" onclick="selectSheet(\'' + name + '\')">' + name + ' <span style="color:#666;font-size:11px;">(' + rowCount + ' 行)</span></div>';
+                    }
+                    
+                    updateProgress(100);
+                    
+                    // 显示 sheet 选择器
+                    document.getElementById('sheetList').innerHTML = sheetListHtml;
+                    document.getElementById('sheetSelector').classList.add('active');
+                    
+                    hideLoading();
+                    hideProgress();
+                    
+                    if (sheetNames.length === 1) {
+                        selectSheet(sheetNames[0]);
+                    } else {
+                        showStatus('success', 'Excel 文件包含 ' + sheetNames.length + ' 个 sheet，请选择要转换的 sheet。');
+                    }
+                    
+                } catch (err) {
+                    console.error('Excel 解析错误:', err);
+                    showStatus('error', 'Excel 解析失败: ' + err.message);
+                    hideLoading();
+                    hideProgress();
+                }
+            };
+            
+            reader.onerror = function() {
+                showStatus('error', 'Excel 文件读取失败，请重试。');
+                hideLoading();
+                hideProgress();
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 选择 sheet
+        function selectSheet(sheetName) {
+            if (!multiSheetData[sheetName]) {
+                showStatus('error', 'Sheet 数据未找到');
+                return;
+            }
+            
+            // 更新选中状态
+            document.querySelectorAll('.sheet-item').forEach(function(item) {
+                if (item.textContent.includes(sheetName)) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            // 填充数据
+            document.getElementById('pasteInput').value = multiSheetData[sheetName];
+            switchTab('paste');
+            document.querySelector('.tab').click();
+            
+            showStatus('success', '已加载 sheet "' + sheetName + '"！点击"转换为 APA7 格式"按钮。');
+        }
+
+        // 转换所有 sheet
+        function convertAllSheets() {
+            if (!currentWorkbook || Object.keys(multiSheetData).length === 0) {
+                showStatus('error', '请先上传 Excel 文件');
+                return;
+            }
+            
+            showLoading('正在转换所有 sheet...');
+            
+            const sheetNames = currentWorkbook.SheetNames;
+            let allResults = '';
+            let count = 0;
+            
+            const options = {
+                showNumber: document.getElementById('showNumber').checked,
+                boldHeaders: document.getElementById('boldHeaders').checked,
+                showBorders: document.getElementById('showBorders').checked,
+                italicCaption: document.getElementById('italicCaption').checked
+            };
+            
+            for (let i = 0; i < sheetNames.length; i++) {
+                const sheetName = sheetNames[i];
+                const csvData = multiSheetData[sheetName];
+                
+                if (!csvData || !csvData.trim()) continue;
+                
+                const data = parseInputData(csvData);
+                if (data.length === 0) continue;
+                
+                // 生成标题
+                let caption;
+                if (options.showNumber) {
+                    caption = '<strong>表 ' + (i + 1) + '</strong> ';
+                    if (options.italicCaption) {
+                        caption += '<em>' + sheetName + '</em>';
+                    } else {
+                        caption += sheetName;
+                    }
+                } else {
+                    caption = options.italicCaption ? '<em>' + sheetName + '</em>' : sheetName;
+                }
+                
+                // 生成表格
+                const tableHtml = generateAPATable(data, options);
+                
+                allResults += '<div class="table-block">';
+                allResults += '<div class="table-caption">' + caption + '</div>';
+                allResults += tableHtml;
+                allResults += '</div>';
+                count++;
+            }
+            
+            // 显示预览
+            document.getElementById('previewSection').style.display = 'block';
+            document.getElementById('tableCaption').innerHTML = '<strong>共 ' + count + ' 个表格</strong>';
+            document.getElementById('apaPreview').innerHTML = allResults;
+            
+            hideLoading();
+            showStatus('success', '已转换 ' + count + ' 个 sheet！可以下载或复制。');
+            
+            // 滚动到预览区域
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         // 解析输入数据
         function parseInputData(input) {
-            // 尝试不同的分隔符
             let lines = input.trim().split('\n');
-            let delimiter = '\t'; // 默认 Tab
+            let delimiter = '\t';
             
-            // 检测分隔符
             if (lines[0].includes(',')) delimiter = ',';
             else if (lines[0].includes(';')) delimiter = ';';
             else if (lines[0].includes('\t')) delimiter = '\t';
             
-            return lines.map(line => line.split(delimiter).map(cell => cell.trim()));
+            return lines.map(function(line) { 
+                return line.split(delimiter).map(function(cell) { return cell.trim(); });
+            });
         }
 
-        // 转换为 APA7 格式
+        // 生成 APA 表格
+        function generateAPATable(data, options) {
+            if (data.length === 0) return '';
+            
+            let html = '<table class="apa-table">';
+            
+            // 表头
+            if (data.length > 0) {
+                html += '<thead><tr>';
+                data[0].forEach(function(header) {
+                    if (options.boldHeaders) {
+                        html += '<th><strong>' + header + '</strong></th>';
+                    } else {
+                        html += '<th>' + header + '</th>';
+                    }
+                });
+                html += '</tr></thead>';
+            }
+
+            // 表体
+            if (data.length > 1) {
+                html += '<tbody>';
+                for (let i = 1; i < data.length; i++) {
+                    html += '<tr>';
+                    data[i].forEach(function(cell) {
+                        html += '<td>' + cell + '</td>';
+                    });
+                    html += '</tr>';
+                }
+                html += '</tbody>';
+            }
+
+            html += '</table>';
+            return html;
+        }
+
+        // 转换为 APA7 格式（单表格）
         function convertToAPA() {
             let data = [];
             let title = '';
             let note = '';
 
-            // 获取当前选项卡
             const activeTab = document.querySelector('.tab.active').textContent;
 
             if (activeTab.includes('粘贴')) {
@@ -789,7 +1048,6 @@
 
             currentData = data;
 
-            // 获取格式选项
             const options = {
                 showNumber: document.getElementById('showNumber').checked,
                 boldHeaders: document.getElementById('boldHeaders').checked,
@@ -797,69 +1055,32 @@
                 italicCaption: document.getElementById('italicCaption').checked
             };
 
-            // 生成 APA7 表格
-            const apaTable = generateAPATable(data, title, note, options);
+            const apaTable = generateAPATable(data, options);
 
             // 显示预览
             document.getElementById('previewSection').style.display = 'block';
             document.getElementById('apaPreview').innerHTML = apaTable;
             
             // 设置标题
-            const captionDiv = document.getElementById('tableCaption');
+            let captionDiv = document.getElementById('tableCaption');
             if (options.showNumber) {
-                captionDiv.innerHTML = `<strong>表 ${tableCounter}</strong> ${options.italicCaption ? '<em>' + title + '</em>' : title}`;
+                captionDiv.innerHTML = '<strong>表 ' + tableCounter + '</strong> ' + (options.italicCaption ? '<em>' + title + '</em>' : title);
             } else {
-                captionDiv.innerHTML = options.italicCaption ? `<em>${title}</em>` : title;
+                captionDiv.innerHTML = options.italicCaption ? '<em>' + title + '</em>' : title;
+            }
+            
+            // 添加注释
+            if (note) {
+                document.getElementById('apaPreview').innerHTML += '<p style="font-style:italic;font-size:11px;margin-top:10px;">' + note + '</p>';
             }
 
             showStatus('success', '✅ 转换成功！可以预览并下载。');
-            
-            // 滚动到预览区域
             document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // 生成 APA7 表格
-        function generateAPATable(data, title, note, options) {
-            if (data.length === 0) return '';
-
-            let html = '<table class="apa-table">';
-            
-            // 表头
-            if (data.length > 0) {
-                html += '<thead><tr>';
-                data[0].forEach(header => {
-                    html += `<th>${options.boldHeaders ? '<strong>' : ''}${header}${options.boldHeaders ? '</strong>' : ''}</th>`;
-                });
-                html += '</tr></thead>';
-            }
-
-            // 表体
-            if (data.length > 1) {
-                html += '<tbody>';
-                for (let i = 1; i < data.length; i++) {
-                    html += '<tr>';
-                    data[i].forEach(cell => {
-                        html += `<td>${cell}</td>`;
-                    });
-                    html += '</tr>';
-                }
-                html += '</tbody>';
-            }
-
-            // 表注
-            if (note) {
-                html += '<tfoot><tr>';
-                html += `<td colspan="${data[0].length}"><em>${note}</em></td>`;
-                html += '</tr></tfoot>';
-            }
-
-            html += '</table>';
-            return html;
         }
 
         // 下载为 Word 文档
         function downloadAsWord() {
-            if (currentData.length === 0) {
+            if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
                 showStatus('error', '请先转换表格！');
                 return;
             }
@@ -867,28 +1088,7 @@
             const title = document.getElementById('tableCaption').innerText;
             const table = document.getElementById('apaPreview').innerHTML;
             
-            const html = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-                      xmlns:w='urn:schemas-microsoft-com:office:word'
-                      xmlns='http://www.w3.org/TR/REC-html40'>
-                <head>
-                    <meta charset="utf-8">
-                    <style>
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12pt; }
-                        thead { border-top: 2pt solid black; border-bottom: 1pt solid black; }
-                        th { font-weight: bold; text-align: left; padding: 5pt; }
-                        td { padding: 5pt; text-align: left; }
-                        tfoot { border-top: 1pt solid black; border-bottom: 2pt solid black; }
-                        tfoot td { font-style: italic; font-size: 10pt; }
-                        .caption { font-style: italic; margin-bottom: 10pt; font-size: 12pt; }
-                    </style>
-                </head>
-                <body>
-                    <div class="caption">${title}</div>
-                    ${table}
-                </body>
-                </html>
-            `;
+            const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12pt; } thead { border-top: 2pt solid black; border-bottom: 1pt solid black; } th { font-weight: bold; text-align: left; padding: 5pt; } td { padding: 5pt; text-align: left; } tfoot { border-top: 1pt solid black; border-bottom: 2pt solid black; } tfoot td { font-style: italic; font-size: 10pt; } .table-caption { font-style: italic; margin-bottom: 10pt; font-size: 12pt; }</style></head><body><div class="table-caption">' + title + '</div>' + table + '</body></html>';
 
             const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
             downloadBlob(blob, 'apa7-table.doc');
@@ -897,7 +1097,7 @@
 
         // 下载为 HTML
         function downloadAsHTML() {
-            if (currentData.length === 0) {
+            if (currentData.length === 0 && document.getElementById('apaPreview').innerHTML === '') {
                 showStatus('error', '请先转换表格！');
                 return;
             }
@@ -905,30 +1105,7 @@
             const title = document.getElementById('tableCaption').innerText;
             const table = document.getElementById('apaPreview').innerHTML;
             
-            const html = `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <style>
-        body { font-family: 'Times New Roman', Times, serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        thead { border-top: 2px solid black; border-bottom: 1px solid black; }
-        th { font-weight: bold; text-align: left; padding: 8px; }
-        td { padding: 8px; text-align: left; }
-        tfoot { border-top: 1px solid black; border-bottom: 2px solid black; }
-        tfoot td { font-style: italic; font-size: 12px; padding: 8px; }
-        .caption { font-style: italic; margin-bottom: 10px; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <div class="caption">${title}</div>
-    ${table}
-</body>
-</html>
-            `;
+            const html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + title + '</title><style>body { font-family: "Times New Roman", Times, serif; padding: 20px; max-width: 800px; margin: 0 auto; } table { width: 100%; border-collapse: collapse; margin: 20px 0; } thead { border-top: 2px solid black; border-bottom: 1px solid black; } th { font-weight: bold; text-align: left; padding: 8px; } td { padding: 8px; text-align: left; } tfoot { border-top: 1px solid black; border-bottom: 2px solid black; } tfoot td { font-style: italic; font-size: 12px; padding: 8px; } .table-caption { font-style: italic; margin-bottom: 10px; font-size: 14px; }</style></head><body><div class="table-caption">' + title + '</div>' + table + '</body></html>';
 
             const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
             downloadBlob(blob, 'apa7-table.html');
@@ -965,18 +1142,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // 显示状态消息
-        function showStatus(type, message) {
-            const status = document.getElementById('status');
-            status.className = `status ${type}`;
-            status.textContent = message;
-            status.style.display = 'block';
-            
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
-        }
-
         // 清空所有
         function clearAll() {
             document.getElementById('pasteInput').value = '';
@@ -985,8 +1150,12 @@
             document.getElementById('tableNote').value = '';
             document.getElementById('fileInput').value = '';
             document.getElementById('fileName').style.display = 'none';
+            document.getElementById('fileInfo').classList.remove('active');
+            document.getElementById('sheetSelector').classList.remove('active');
             document.getElementById('previewSection').style.display = 'none';
             currentData = [];
+            multiSheetData = {};
+            currentWorkbook = null;
             showStatus('success', '已清空所有内容。');
         }
 
