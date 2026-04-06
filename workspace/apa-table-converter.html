@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APA7 表格格式转换器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #2c3e50;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        .tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-btn {
+            width: 100%;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 3px dashed #dee2e6;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .preview-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .apa-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+
+        .apa-table thead {
+            border-top: 2px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .apa-table th {
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .apa-table tbody tr {
+            border-bottom: none;
+        }
+
+        .apa-table td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .apa-table tfoot {
+            border-top: 1px solid black;
+            border-bottom: 2px solid black;
+        }
+
+        .apa-table tfoot td {
+            font-style: italic;
+            font-size: 10px;
+            padding: 8px;
+        }
+
+        .table-caption {
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .format-options {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .format-options h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 APA7 表格格式转换器</h1>
+            <p>快速将你的表格转换为符合 APA 第7版标准的格式</p>
+        </div>
+
+        <div class="content">
+            <!-- 使用说明 -->
+            <div class="info-box">
+                <h3>💡 APA7 表格格式要求</h3>
+                <ul>
+                    <li>表格编号（如：表 1）在表格上方，<strong>加粗</strong></li>
+                    <li>表格标题在表格上方，<em>斜体</em></li>
+                    <li>只使用水平线，不使用垂直线</li>
+                    <li>列标题<strong>加粗</strong></li>
+                    <li>表格注释在表格下方，<em>斜体</em></li>
+                </ul>
+            </div>
+
+            <!-- 选项卡 -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('paste')">📝 粘贴数据</button>
+                <button class="tab" onclick="switchTab('upload')">📁 上传文件</button>
+                <button class="tab" onclick="switchTab('manual')">✏️ 手动输入</button>
+            </div>
+
+            <!-- 粘贴数据 -->
+            <div id="paste-tab" class="tab-content active">
+                <div class="input-section">
+                    <label>粘贴你的表格数据（支持 Tab/逗号/分号分隔）：</label>
+                    <textarea id="pasteInput" placeholder="示例：
+姓名	年龄	分数	等级
+张三	25	92	A
+李四	28	88	B+
+王五	22	95	A+
+
+或：
+姓名,年龄,分数,等级
+张三,25,92,A
+李四,28,88,B+
+王五,22,95,A+"></textarea>
+                </div>
+            </div>
+
+            <!-- 上传文件 -->
+            <div id="upload-tab" class="tab-content">
+                <div class="input-section">
+                    <label>上传 CSV 或 Excel 文件：</label>
+                    <div class="file-upload">
+                        <div class="file-upload-btn">
+                            <p>📁 点击或拖拽文件到此处</p>
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">支持 .csv, .xlsx, .xls 格式</p>
+                        </div>
+                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFileUpload(event)">
+                    </div>
+                    <div id="fileName" style="margin-top: 10px; color: #27ae60; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- 手动输入 -->
+            <div id="manual-tab" class="tab-content">
+                <div class="input-section">
+                    <label>表格标题（斜体显示）：</label>
+                    <input type="text" id="tableTitle" placeholder="例如：学生成绩统计表" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px; margin-bottom: 20px;">
+                    
+                    <label>表格数据（每行一个数据，用逗号分隔）：</label>
+                    <textarea id="manualInput" placeholder="第一行为列标题
+例如：
+姓名,年龄,分数,等级
+张三,25,92,A
+李四,28,88,B+
+王五,22,95,A+" style="min-height: 250px;"></textarea>
+                    
+                    <label style="margin-top: 20px;">表格注释（可选）：</label>
+                    <textarea id="tableNote" placeholder="例如：注：数据来源于2025年期末考试" style="min-height: 80px; margin-top: 10px;"></textarea>
+                </div>
+            </div>
+
+            <!-- 格式选项 -->
+            <div class="format-options">
+                <h3>⚙️ 格式选项</h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showNumber" checked>
+                        <label for="showNumber">显示表格编号</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="boldHeaders" checked>
+                        <label for="boldHeaders">列标题加粗</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showBorders" checked>
+                        <label for="showBorders">显示表格线</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="italicCaption" checked>
+                        <label for="italicCaption">标题斜体</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="button-group">
+                <button class="btn-primary" onclick="convertToAPA()">
+                    🔄 转换为 APA7 格式
+                </button>
+                <button class="btn-secondary" onclick="clearAll()">
+                    🗑️ 清空
+                </button>
+            </div>
+
+            <!-- 状态消息 -->
+            <div id="status" class="status"></div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">📄 APA7 格式预览</h2>
+                
+                <div style="background: white; padding: 30px; border: 1px solid #ddd; margin-bottom: 20px;">
+                    <div id="tableCaption" class="table-caption"></div>
+                    <div id="apaPreview"></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-success" onclick="downloadAsWord()">
+                        📥 下载为 Word 文档
+                    </button>
+                    <button class="btn-primary" onclick="copyToClipboard()">
+                        📋 复制到剪贴板
+                    </button>
+                    <button class="btn-secondary" onclick="downloadAsHTML()">
+                        💾 下载为 HTML
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        let currentData = [];
+        let tableCounter = 1;
+
+        // 切换选项卡
+        function switchTab(tabName) {
+            // 移除所有活动状态
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 激活选中的选项卡
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // 处理文件上传
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileName = document.getElementById('fileName');
+            fileName.style.display = 'block';
+            fileName.innerHTML = `✅ 已选择: ${file.name}`;
+
+            const reader = new FileReader();
+            
+            if (file.name.endsWith('.csv')) {
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    document.getElementById('pasteInput').value = text;
+                    switchTab('paste');
+                    document.querySelector('.tab').click();
+                    showStatus('success', 'CSV 文件已加载！点击"转换为 APA7 格式"按钮。');
+                };
+                reader.readAsText(file);
+            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const csvData = XLSX.utils.sheet_to_csv(firstSheet);
+                    document.getElementById('pasteInput').value = csvData;
+                    switchTab('paste');
+                    document.querySelector('.tab').click();
+                    showStatus('success', 'Excel 文件已加载！点击"转换为 APA7 格式"按钮。');
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        // 解析输入数据
+        function parseInputData(input) {
+            // 尝试不同的分隔符
+            let lines = input.trim().split('\n');
+            let delimiter = '\t'; // 默认 Tab
+            
+            // 检测分隔符
+            if (lines[0].includes(',')) delimiter = ',';
+            else if (lines[0].includes(';')) delimiter = ';';
+            else if (lines[0].includes('\t')) delimiter = '\t';
+            
+            return lines.map(line => line.split(delimiter).map(cell => cell.trim()));
+        }
+
+        // 转换为 APA7 格式
+        function convertToAPA() {
+            let data = [];
+            let title = '';
+            let note = '';
+
+            // 获取当前选项卡
+            const activeTab = document.querySelector('.tab.active').textContent;
+
+            if (activeTab.includes('粘贴')) {
+                const input = document.getElementById('pasteInput').value;
+                if (!input.trim()) {
+                    showStatus('error', '请先输入表格数据！');
+                    return;
+                }
+                data = parseInputData(input);
+                title = '数据表格';
+            } else if (activeTab.includes('手动')) {
+                const input = document.getElementById('manualInput').value;
+                title = document.getElementById('tableTitle').value || '数据表格';
+                note = document.getElementById('tableNote').value;
+                
+                if (!input.trim()) {
+                    showStatus('error', '请先输入表格数据！');
+                    return;
+                }
+                data = parseInputData(input);
+            } else {
+                showStatus('error', '请先上传文件或输入数据！');
+                return;
+            }
+
+            if (data.length === 0) {
+                showStatus('error', '数据解析失败，请检查格式！');
+                return;
+            }
+
+            currentData = data;
+
+            // 获取格式选项
+            const options = {
+                showNumber: document.getElementById('showNumber').checked,
+                boldHeaders: document.getElementById('boldHeaders').checked,
+                showBorders: document.getElementById('showBorders').checked,
+                italicCaption: document.getElementById('italicCaption').checked
+            };
+
+            // 生成 APA7 表格
+            const apaTable = generateAPATable(data, title, note, options);
+
+            // 显示预览
+            document.getElementById('previewSection').style.display = 'block';
+            document.getElementById('apaPreview').innerHTML = apaTable;
+            
+            // 设置标题
+            const captionDiv = document.getElementById('tableCaption');
+            if (options.showNumber) {
+                captionDiv.innerHTML = `<strong>表 ${tableCounter}</strong> ${options.italicCaption ? '<em>' + title + '</em>' : title}`;
+            } else {
+                captionDiv.innerHTML = options.italicCaption ? `<em>${title}</em>` : title;
+            }
+
+            showStatus('success', '✅ 转换成功！可以预览并下载。');
+            
+            // 滚动到预览区域
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 生成 APA7 表格
+        function generateAPATable(data, title, note, options) {
+            if (data.length === 0) return '';
+
+            let html = '<table class="apa-table">';
+            
+            // 表头
+            if (data.length > 0) {
+                html += '<thead><tr>';
+                data[0].forEach(header => {
+                    html += `<th>${options.boldHeaders ? '<strong>' : ''}${header}${options.boldHeaders ? '</strong>' : ''}</th>`;
+                });
+                html += '</tr></thead>';
+            }
+
+            // 表体
+            if (data.length > 1) {
+                html += '<tbody>';
+                for (let i = 1; i < data.length; i++) {
+                    html += '<tr>';
+                    data[i].forEach(cell => {
+                        html += `<td>${cell}</td>`;
+                    });
+                    html += '</tr>';
+                }
+                html += '</tbody>';
+            }
+
+            // 表注
+            if (note) {
+                html += '<tfoot><tr>';
+                html += `<td colspan="${data[0].length}"><em>${note}</em></td>`;
+                html += '</tr></tfoot>';
+            }
+
+            html += '</table>';
+            return html;
+        }
+
+        // 下载为 Word 文档
+        function downloadAsWord() {
+            if (currentData.length === 0) {
+                showStatus('error', '请先转换表格！');
+                return;
+            }
+
+            const title = document.getElementById('tableCaption').innerText;
+            const table = document.getElementById('apaPreview').innerHTML;
+            
+            const html = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                      xmlns:w='urn:schemas-microsoft-com:office:word'
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12pt; }
+                        thead { border-top: 2pt solid black; border-bottom: 1pt solid black; }
+                        th { font-weight: bold; text-align: left; padding: 5pt; }
+                        td { padding: 5pt; text-align: left; }
+                        tfoot { border-top: 1pt solid black; border-bottom: 2pt solid black; }
+                        tfoot td { font-style: italic; font-size: 10pt; }
+                        .caption { font-style: italic; margin-bottom: 10pt; font-size: 12pt; }
+                    </style>
+                </head>
+                <body>
+                    <div class="caption">${title}</div>
+                    ${table}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+            downloadBlob(blob, 'apa7-table.doc');
+            showStatus('success', '✅ Word 文档已下载！');
+        }
+
+        // 下载为 HTML
+        function downloadAsHTML() {
+            if (currentData.length === 0) {
+                showStatus('error', '请先转换表格！');
+                return;
+            }
+
+            const title = document.getElementById('tableCaption').innerText;
+            const table = document.getElementById('apaPreview').innerHTML;
+            
+            const html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        thead { border-top: 2px solid black; border-bottom: 1px solid black; }
+        th { font-weight: bold; text-align: left; padding: 8px; }
+        td { padding: 8px; text-align: left; }
+        tfoot { border-top: 1px solid black; border-bottom: 2px solid black; }
+        tfoot td { font-style: italic; font-size: 12px; padding: 8px; }
+        .caption { font-style: italic; margin-bottom: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="caption">${title}</div>
+    ${table}
+</body>
+</html>
+            `;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            downloadBlob(blob, 'apa7-table.html');
+            showStatus('success', '✅ HTML 文件已下载！');
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const preview = document.getElementById('apaPreview');
+            const range = document.createRange();
+            range.selectNode(preview);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                showStatus('success', '✅ 表格已复制到剪贴板！可以直接粘贴到 Word 中。');
+            } catch (err) {
+                showStatus('error', '复制失败，请手动选择并复制。');
+            }
+            
+            window.getSelection().removeAllRanges();
+        }
+
+        // 下载 Blob
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 显示状态消息
+        function showStatus(type, message) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        // 清空所有
+        function clearAll() {
+            document.getElementById('pasteInput').value = '';
+            document.getElementById('manualInput').value = '';
+            document.getElementById('tableTitle').value = '';
+            document.getElementById('tableNote').value = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileName').style.display = 'none';
+            document.getElementById('previewSection').style.display = 'none';
+            currentData = [];
+            showStatus('success', '已清空所有内容。');
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    convertToAPA();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
