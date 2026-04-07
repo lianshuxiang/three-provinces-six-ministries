@@ -67,21 +67,40 @@
             background: #6c757d;
             color: white;
         }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
         .sheet-selector {
             margin: 20px 0;
         }
         .sheet-item {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 8px 16px;
             margin: 5px;
             background: #f0f0f0;
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
             border-radius: 5px;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .sheet-item.active {
+        .sheet-item.selected {
             background: #667eea;
             color: white;
+            border-color: #5a6fd6;
+        }
+        .sheet-item input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .sheet-actions {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 5px;
         }
         .options {
             margin: 20px 0;
@@ -93,7 +112,7 @@
             margin: 10px 0;
         }
         .preview {
-                margin: 20px 0;
+            margin: 20px 0;
             padding: 20px;
             background: #f8f9ff;
             border-radius: 5px;
@@ -117,75 +136,63 @@
             background: #f8d7da;
             color: #721c24;
         }
+        .status.info {
+            background: #cce5ff;
+            color: #004085;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin: 10px 0;
         }
         th, td {
-                padding: 8px;
-                border: 1px solid #000;
+            padding: 8px;
             text-align: left;
-            font-weight: bold;
             font-family: 'Times New Roman', Times, serif;
             font-size: 12px;
-            background-color: #f0f0f0;
+        }
+        th {
+            font-weight: bold;
             border-bottom: 2px solid #000;
             border-top: 1px solid #000;
-            border-left: none;
-            border-right: none;
+            background-color: #f0f0f0;
         }
         td {
-                padding: 8px;
-                text-align: left;
-                border: none;
-                border-bottom: 1px solid #000;
-            font-family: 'Times New Roman', Times, serif;
-                font-size: 12px;
-            background-color: #fff;
-            border-left: none;
-            border-right: none;
+            border-bottom: 1px solid #000;
         }
-        tr:nth-child(even) td {
-                background-color: #f9f9f9;
-            }
-            tr:nth-child(odd) td {
-                background-color: #fff;
-            }
         .table-note {
-                font-style: italic;
-                font-size: 12px;
-                text-align: left;
-                margin-top: 10px;
-                border: none;
+            font-style: italic;
+            font-size: 12px;
+            text-align: left;
+            margin-top: 10px;
             font-family: 'Times New Roman', Times, serif;
             color: #666;
-            background-color: #fff;
-            padding: 5px;
-            border-top: 1px solid #000;
-                border-left: none;
-                border-right: none;
-            }
+        }
         .title {
-                font-weight: bold;
+            font-weight: bold;
             font-size: 12px;
             font-family: 'Times New Roman', Times, serif;
             text-align: left;
-            border: none;
-            background-color: #f0f0f0;
-            border-bottom: 1px solid #000;
+            margin-bottom: 5px;
         }
         .title-italic {
-                font-style: italic;
-                font-weight: normal;
-                font-size: 12px;
+            font-style: italic;
+            font-weight: normal;
+            font-size: 12px;
             font-family: 'Times New Roman', Times, serif;
             text-align: left;
-            border: none;
-            border-bottom: 1px solid #000;
-            background-color: #f0f0f0;
-            padding: 5px;
-            border-left: none;
-            border-right: none;
+            margin-bottom: 5px;
+        }
+        .multi-preview {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        .multi-preview h4 {
+            margin-bottom: 10px;
+            color: #667eea;
         }
     </style>
 </head>
@@ -204,8 +211,13 @@
         </div>
 
         <div class="sheet-selector" id="sheetSelector" style="display:none;">
-            <h4>📑 选择 Sheet:</h4>
+            <h4>📑 选择 Sheet (可多选):</h4>
             <div id="sheetList"></div>
+            <div class="sheet-actions">
+                <button class="btn btn-secondary" onclick="selectAllSheets()">✅ 全选</button>
+                <button class="btn btn-secondary" onclick="deselectAllSheets()">❌ 取消全选</button>
+                <span id="selectedCount" style="margin-left: 15px; color: #666;"></span>
+            </div>
         </div>
 
         <div class="options" id="formatOptions">
@@ -224,7 +236,9 @@
             </div>
         </div>
 
-        <button class="btn btn-primary" id="convertBtn" onclick="convertToAPA()">🔄 转换为 APA 格式</button>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-primary btn-lg" id="convertBtn" onclick="convertToAPA()">🔄 转换为 APA 格式</button>
+        </div>
 
         <div id="status"></div>
 
@@ -235,7 +249,7 @@
 
         <div class="download-buttons" id="downloadButtons" style="display:none">
             <button class="btn btn-success" onclick="downloadAsWord()">📥 下载 Word</button>
-            <button class="btn btn-success" onclick="downloadAsExcel()">📊 下载 Excel</button>
+            <button class="btn btn-warning" onclick="downloadAsExcel()">📊 下载 Excel (多表格)</button>
             <button class="btn btn-secondary" onclick="downloadAsHTML()">💾 下载 HTML</button>
         </div>
     </div>
@@ -245,6 +259,8 @@
         let currentSheetName = null;
         let currentData = null;
         let convertedTable = null;
+        let selectedSheets = new Set();
+        let convertedTables = []; // 存储所有转换后的表格
 
         // 拖拽上传
         const dropZone = document.getElementById('dropZone');
@@ -271,10 +287,11 @@
         });
 
         function handleFile(file) {
+            if (!file) return;
+            
             const fileName = file.name.toLowerCase();
             
             if (fileName.endsWith('.csv')) {
-                // 处理 CSV 文件
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const content = e.target.result;
@@ -283,7 +300,6 @@
                 };
                 reader.readAsText(file);
             } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-                // 处理 Excel 文件
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const data = new Uint8Array(e.target.result);
@@ -315,31 +331,58 @@
             document.getElementById('sheetSelector').style.display = 'block';
             const sheetList = document.getElementById('sheetList');
             sheetList.innerHTML = '';
+            selectedSheets.clear();
             
             currentWorkbook.SheetNames.forEach((name, index) => {
-                const item = document.createElement('div');
-                item.className = 'sheet-item' + (index === 0 ? ' active' : '');
-                item.textContent = name;
-                item.onclick = () => selectSheet(name);
+                const item = document.createElement('label');
+                item.className = 'sheet-item';
+                item.innerHTML = `
+                    <input type="checkbox" value="${name}" ${index === 0 ? 'checked' : ''} onchange="toggleSheet('${name}')">
+                    <span>${name}</span>
+                `;
                 sheetList.appendChild(item);
-            });
-            
-            selectSheet(currentWorkbook.SheetNames[0]);
-        }
-
-        function selectSheet(name) {
-            currentSheetName = name;
-            document.querySelectorAll('.sheet-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.textContent === name) {
-                    item.classList.add('active');
+                
+                if (index === 0) {
+                    selectedSheets.add(name);
                 }
             });
             
-            const worksheet = currentWorkbook.Sheets[name];
-            currentData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            
+            updateSelectedCount();
             document.getElementById('convertBtn').disabled = false;
+        }
+
+        function toggleSheet(name) {
+            if (selectedSheets.has(name)) {
+                selectedSheets.delete(name);
+            } else {
+                selectedSheets.add(name);
+            }
+            updateSelectedCount();
+        }
+
+        function selectAllSheets() {
+            if (!currentWorkbook) return;
+            currentWorkbook.SheetNames.forEach(name => {
+                selectedSheets.add(name);
+            });
+            document.querySelectorAll('.sheet-item input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+            updateSelectedCount();
+        }
+
+        function deselectAllSheets() {
+            selectedSheets.clear();
+            document.querySelectorAll('.sheet-item input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = selectedSheets.size;
+            document.getElementById('selectedCount').textContent = 
+                count > 0 ? `已选择 ${count} 个表格` : '未选择任何表格';
         }
 
         function showFileInfo(name, size) {
@@ -349,69 +392,88 @@
         }
 
         function convertToAPA() {
-            if (!currentData || currentData.length === 0) {
+            convertedTables = [];
+            
+            if (currentWorkbook && selectedSheets.size === 0) {
+                showStatus('error', '❌ 请至少选择一个 Sheet');
+                return;
+            }
+            
+            if (currentWorkbook) {
+                // 处理多个 Sheet
+                let allTablesHTML = '';
+                let tableNum = 1;
+                
+                selectedSheets.forEach(sheetName => {
+                    const worksheet = currentWorkbook.Sheets[sheetName];
+                    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    if (data && data.length > 0) {
+                        const tableHTML = generateAPATable(data, sheetName, tableNum);
+                        convertedTables.push({ name: sheetName, data: data, html: tableHTML });
+                        allTablesHTML += tableHTML;
+                        tableNum++;
+                    }
+                });
+                
+                convertedTable = allTablesHTML;
+                showStatus('success', `✅ 成功转换 ${convertedTables.length} 个表格!`);
+            } else if (currentData) {
+                // 处理 CSV
+                convertedTable = generateAPATable(currentData, 'Table', 1);
+                convertedTables.push({ name: 'Table', data: currentData, html: convertedTable });
+                showStatus('success', '✅ 转换成功!');
+            } else {
                 showStatus('error', '❌ 没有数据可转换');
                 return;
             }
-
-            const showNumber = document.getElementById('showNumber').checked;
-            const boldHeader = document.getElementById('boldHeader').checked;
-            const showBorder = document.getElementById('showBorder').checked;
-            const italicTitle = document.getElementById('italicTitle').checked;
-
-            // 获取表格标题
-            let tableName = currentSheetName || 'Table';
-            
-            // 生成表格编号
-            let numberHTML = showNumber ? '<p class="title">Table 1</p>' : '';
-            
-            // 生成表格标题（斜体）
-            let captionClass = italicTitle ? 'title-italic' : 'title';
-            let captionHTML = `<p class="${captionClass}">${tableName}</p>`;
-            
-            // 生成表格
-            let tableHTML = '<table>\n';
-            
-            // 表头
-            if (currentData.length > 0) {
-                const headers = currentData[0];
-                tableHTML += '<thead><tr>\n';
-                headers.forEach(header => {
-                    const style = boldHeader ? 'style="font-weight: bold;"' : '';
-                    tableHTML += `<th ${style}>${header || ''}</th>\n`;
-                });
-                tableHTML += '</tr></thead>\n';
-            }
-            
-            // 表体
-            tableHTML += '<tbody>\n';
-            for (let i = 1; i < currentData.length; i++) {
-                tableHTML += '<tr>\n';
-                currentData[i].forEach(cell => {
-                    tableHTML += `<td>${cell || ''}</td>\n`;
-                });
-                tableHTML += '</tr>\n';
-            }
-            tableHTML += '</tbody>\n';
-            tableHTML += '</table>';
-            
-            // 表格注释
-            let noteHTML = '<p class="table-note">Note. </p>';
-
-            // 组合完整 HTML
-            convertedTable = `
-                ${numberHTML}
-                ${captionHTML}
-                ${tableHTML}
-                ${noteHTML}
-            `;
 
             // 显示预览
             document.getElementById('tablePreview').innerHTML = convertedTable;
             document.getElementById('preview').style.display = 'block';
             document.getElementById('downloadButtons').style.display = 'block';
+        }
+
+        function generateAPATable(data, tableName, tableNum) {
+            const showNumber = document.getElementById('showNumber').checked;
+            const boldHeader = document.getElementById('boldHeader').checked;
+            const italicTitle = document.getElementById('italicTitle').checked;
+
+            let numberHTML = showNumber ? `<p class="title">Table ${tableNum}</p>` : '';
+            let captionClass = italicTitle ? 'title-italic' : 'title';
+            let captionHTML = `<p class="${captionClass}">${tableName}</p>`;
             
-            showStatus('success', '✅ 转换成功!');
+            let tableHTML = '<table>\n';
+            
+            if (data.length > 0) {
+                const headers = data[0];
+                tableHTML += '<thead><tr>\n';
+                headers.forEach(header => {
+                    tableHTML += `<th>${header || ''}</th>\n`;
+                });
+                tableHTML += '</tr></thead>\n';
+            }
+            
+            tableHTML += '<tbody>\n';
+            for (let i = 1; i < data.length; i++) {
+                tableHTML += '<tr>\n';
+                data[i].forEach(cell => {
+                    tableHTML += `<td>${cell || ''}</td>\n`;
+                });
+                tableHTML += '</tr>\n';
+            }
+            tableHTML += '</tbody>\n</table>';
+            
+            let noteHTML = '<p class="table-note">Note. </p>';
+
+            return `
+                <div class="multi-preview">
+                    ${numberHTML}
+                    ${captionHTML}
+                    ${tableHTML}
+                    ${noteHTML}
+                </div>
+            `;
         }
 
         function downloadAsHTML() {
@@ -420,8 +482,9 @@
                 return;
             }
             
-            const blob = new Blob([convertedTable], { type: 'text/html' });
-            download(blob, 'apa-table.html');
+            const blob = new Blob([convertedTable], { type: 'text/html;charset=utf-8' });
+            download(blob, 'apa-tables.html');
+            showStatus('success', '✅ HTML 下载成功!');
         }
 
         function downloadAsWord() {
@@ -437,8 +500,9 @@
     <meta charset="UTF-8">
     <style>
         body { font-family: 'Times New Roman', Times, serif; }
-        table { border-collapse: collapse; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
         td, th { border: 1px solid #000; padding: 8px; }
+        th { font-weight: bold; background-color: #f0f0f0; }
     </style>
 </head>
 <body>
@@ -447,20 +511,40 @@
 </html>
             `;
             
-            const blob = new Blob([html], { type: 'application/msword' });
-            download(blob, 'apa-table.doc');
+            const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
+            download(blob, 'apa-tables.doc');
+            showStatus('success', '✅ Word 下载成功!');
         }
 
         function downloadAsExcel() {
-            if (!currentData) {
+            if (convertedTables.length === 0) {
                 showStatus('error', '❌ 请先转换表格');
                 return;
             }
             
-            const ws = XLSX.utils.json_to_sheet(currentData);
-            const wb = XLSX.utils.book_new_sheet(wb, 'APA Table');
-            XLSX.utils.book_append_sheet(wb, ws, 'Table');
-            XLSX.writeFile(wb, 'apa-table.xlsx');
+            try {
+                // 创建新工作簿
+                const wb = XLSX.utils.book_new();
+                
+                // 为每个转换的表格创建一个 Sheet
+                convertedTables.forEach((table, index) => {
+                    const ws = XLSX.utils.aoa_to_sheet(table.data);
+                    
+                    // Sheet 名称最长 31 字符
+                    let sheetName = table.name.substring(0, 31);
+                    // 移除非法字符
+                    sheetName = sheetName.replace(/[\\\/\?\*\[\]]/g, '_');
+                    
+                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                });
+                
+                // 下载文件
+                XLSX.writeFile(wb, 'apa-tables.xlsx');
+                showStatus('success', `✅ Excel 下载成功! 包含 ${convertedTables.length} 个表格`);
+            } catch (error) {
+                console.error('Excel 导出错误:', error);
+                showStatus('error', '❌ Excel 导出失败: ' + error.message);
+            }
         }
 
         function download(blob, filename) {
@@ -468,7 +552,9 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
@@ -477,9 +563,12 @@
             status.className = 'status ' + type;
             status.textContent = message;
             status.style.display = 'block';
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 3000);
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }
         }
     </script>
 </body>
